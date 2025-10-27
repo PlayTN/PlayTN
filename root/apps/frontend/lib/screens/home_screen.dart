@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/screens/donations_screen.dart';
+import 'package:frontend/screens/help_screen.dart';
 import 'package:frontend/screens/profile_screen.dart';
-import 'package:frontend/widgets/map_view.dart'; // We'll create this next
+import 'package:frontend/screens/scanner_screen.dart';
+import 'package:frontend/widgets/map_view.dart';
+import 'package:frontend/theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,10 +15,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  bool _isItemBorrowed = false; // State to track if an item is borrowed
 
   static const List<Widget> _widgetOptions = <Widget>[
-    MapView(), // The map screen
-    ProfileScreen(), // The new profile screen
+    MapView(),
+    DonationsScreen(),
+    ProfileScreen(),
+    HelpScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -23,47 +30,98 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  void _onScanQrPressed() {
-    // Placeholder for RF3: QR Scan
+  void _onScanQrPressed() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ScannerScreen()),
+    );
+
+    if (result != null && result is String) {
+      setState(() {
+        _isItemBorrowed = true; // Set item as borrowed
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Locker "$result" sbloccato con successo!'),
+          backgroundColor: AppTheme.accentColor,
+        ),
+      );
+    }
+  }
+
+  void _onReturnPressed() {
+    // Logic for returning the item
+    setState(() {
+      _isItemBorrowed = false; // Set item as returned
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Funzione Scansione QR non ancora implementata.'),
-        duration: Duration(seconds: 2),
+        content: Text('Oggetto restituito con successo!'),
+        backgroundColor: AppTheme.accentColor,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final Color blueColor = Colors.blue.shade800;
-    final Color creamColor = const Color(0xFFF5F5DC);
-
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _widgetOptions,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onScanQrPressed,
-        backgroundColor: blueColor,
-        child: const Icon(Icons.qr_code_scanner, color: Colors.white),
-      ),
+      floatingActionButton: _isItemBorrowed
+          ? FloatingActionButton.extended(
+              onPressed: _onReturnPressed,
+              label: const Text('RESTITUISCI'),
+              icon: const Icon(Icons.keyboard_return),
+              backgroundColor: Colors.orange.shade700,
+            )
+          : FloatingActionButton(
+              onPressed: _onScanQrPressed,
+              child: const Icon(Icons.qr_code_scanner),
+            ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
-        color: creamColor,
-        shape: const CircularNotchedRectangle(),
         notchMargin: 8.0,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.map_outlined, color: _selectedIndex == 0 ? blueColor : Colors.grey.shade600),
-              onPressed: () => _onItemTapped(0),
-              iconSize: 30,
+            _buildNavItem(icon: Icons.map_outlined, index: 0, label: 'Mappa'),
+            _buildNavItem(icon: Icons.card_giftcard_outlined, index: 1, label: 'Dona'),
+            const SizedBox(width: 48), // Spacer for FAB
+            _buildNavItem(icon: Icons.person_outline, index: 2, label: 'Profilo'),
+            _buildNavItem(icon: Icons.help_outline, index: 3, label: 'Help'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({required IconData icon, required int index, required String label}) {
+    final bool isSelected = _selectedIndex == index;
+    return InkWell(
+      onTap: () => _onItemTapped(index),
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        // Reduced vertical padding to prevent overflow
+        padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? AppTheme.primaryColor : AppTheme.subtleTextColor,
+              size: 26,
             ),
-            IconButton(
-              icon: Icon(Icons.person_outline, color: _selectedIndex == 1 ? blueColor : Colors.grey.shade600),
-              onPressed: () => _onItemTapped(1),
-              iconSize: 30,
+            // Reduced SizedBox height
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? AppTheme.primaryColor : AppTheme.subtleTextColor,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ],
         ),

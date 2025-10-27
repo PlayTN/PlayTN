@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:frontend/models/locker_model.dart';
+import 'package:frontend/services/locker_service.dart';
+import 'package:frontend/theme/app_theme.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapView extends StatefulWidget {
   const MapView({super.key});
@@ -10,37 +12,19 @@ class MapView extends StatefulWidget {
   State<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
+class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
+  late Future<List<Locker>> _lockersFuture;
+  final LockerService _lockerService = LockerService();
   String? _openCompartmentId;
-  final Color creamColor = const Color(0xFFF5F5DC);
-  final Color blueColor = Colors.blue.shade800;
 
-  final List<Locker> _lockers = [
-    Locker(
-        id: 'piazza-duomo',
-        name: 'Locker Piazza Duomo',
-        location: const LatLng(46.0709, 11.1213),
-        compartments: [
-          Compartment(id: 'a1', content: 'Pallone da Basket'),
-          Compartment(id: 'a2', content: 'Set Frisbee'),
-        ]),
-    Locker(
-        id: 'muse',
-        name: 'Locker MUSE',
-        location: const LatLng(46.0652, 11.1297),
-        compartments: [
-          Compartment(id: 'b1', content: 'Libri di Poesia'),
-        ]),
-    Locker(
-        id: 'stazione-fs',
-        name: 'Locker Stazione FS',
-        location: const LatLng(46.0721, 11.1185),
-        compartments: [
-          Compartment(id: 'c1', content: 'Set da Scacchi'),
-          Compartment(id: 'c2', content: 'Racchette da Ping-Pong'),
-          Compartment(id: 'c3', content: 'Bocce'),
-        ]),
-  ];
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _lockersFuture = _lockerService.getLockers();
+  }
 
   void _showLockerDetails(BuildContext context, Locker locker) {
     showModalBottomSheet(
@@ -56,9 +40,9 @@ class _MapViewState extends State<MapView> {
               maxChildSize: 0.6,
               builder: (_, controller) {
                 return Container(
-                  decoration: BoxDecoration(
-                    color: creamColor,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  decoration: const BoxDecoration(
+                    color: AppTheme.backgroundColor,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                   ),
                   child: Column(
                     children: [
@@ -67,7 +51,7 @@ class _MapViewState extends State<MapView> {
                         height: 5,
                         margin: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
+                          color: AppTheme.borderColor,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -79,7 +63,7 @@ class _MapViewState extends State<MapView> {
                             Text(
                               locker.name,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.textColor),
                             ),
                             const SizedBox(height: 24),
                             ...locker.compartments.map((compartment) {
@@ -87,20 +71,13 @@ class _MapViewState extends State<MapView> {
                               final bool canOpen = _openCompartmentId == null;
 
                               return Card(
-                                color: Colors.white,
-                                elevation: 0,
-                                margin: const EdgeInsets.symmetric(vertical: 8.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.grey.shade200, width: 1),
-                                ),
                                 child: ListTile(
-                                  leading: Icon(Icons.inventory_2_outlined, color: blueColor),
+                                  leading: const Icon(Icons.inventory_2_outlined, color: AppTheme.primaryColor),
                                   title: Text(compartment.content, style: const TextStyle(fontWeight: FontWeight.w600)),
                                   subtitle: Text('Scompartimento ${compartment.id.toUpperCase()}'),
                                   trailing: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isThisCompartmentOpen ? Colors.orange.shade700 : blueColor,
+                                      backgroundColor: isThisCompartmentOpen ? AppTheme.accentColor : AppTheme.primaryColor,
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(12),
                                     ),
@@ -135,35 +112,44 @@ class _MapViewState extends State<MapView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
+    final LatLngBounds trentoBounds = LatLngBounds(
+      const LatLng(46.04, 11.10),
+      const LatLng(46.09, 11.15),
+    );
+
     return Scaffold(
-      backgroundColor: creamColor,
-      appBar: AppBar(
-        backgroundColor: creamColor,
-        elevation: 1,
-        shadowColor: Colors.black.withOpacity(0.1),
-        title: Text(
-          'Mappa',
-          style: TextStyle(
-            color: blueColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Stack(
-        children: [
-          FlutterMap(
-            options: const MapOptions(
-              initialCenter: LatLng(46.0667, 11.1167),
-              initialZoom: 14.0,
+      appBar: AppBar(title: const Text('Mappa')),
+      body: FutureBuilder<List<Locker>>(
+        future: _lockersFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Errore: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('Nessun locker trovato.'));
+          }
+
+          final lockers = snapshot.data!;
+
+          return FlutterMap(
+            options: MapOptions(
+              initialCenter: const LatLng(46.0678, 11.1211),
+              initialZoom: 15.5,
+              cameraConstraint: CameraConstraint.contain(bounds: trentoBounds),
+              maxZoom: 18.0,
+              minZoom: 13.0,
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png',
+                urlTemplate: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
                 subdomains: const ['a', 'b', 'c', 'd'],
+                retinaMode: true,
               ),
               MarkerLayer(
-                markers: _lockers.map((locker) {
+                markers: lockers.map((locker) {
                   return Marker(
                     width: 40.0,
                     height: 40.0,
@@ -172,7 +158,7 @@ class _MapViewState extends State<MapView> {
                       onTap: () => _showLockerDetails(context, locker),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: blueColor,
+                            color: AppTheme.primaryColor,
                             shape: BoxShape.circle,
                             boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.2), spreadRadius: 3, blurRadius: 5)]),
                         child: const Icon(Icons.sports_soccer, color: Colors.white, size: 22.0),
@@ -182,8 +168,8 @@ class _MapViewState extends State<MapView> {
                 }).toList(),
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

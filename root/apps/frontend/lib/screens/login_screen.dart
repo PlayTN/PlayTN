@@ -13,103 +13,66 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define the new color palette
-    final Color creamColor = const Color(0xFFF5F5DC);
-    final Color blueColor = Colors.blue.shade800;
+    // Calculate the available height to ensure the column can be centered
+    final screenHeight = MediaQuery.of(context).size.height;
+    final safeAreaPadding = MediaQuery.of(context).padding;
+    final availableHeight = screenHeight - safeAreaPadding.top - safeAreaPadding.bottom;
 
     return Scaffold(
-      backgroundColor: creamColor,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32.0),
+          child: SizedBox(
+            height: availableHeight,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Placeholder for logo
                 Icon(
-                  Icons.sports_soccer, // Placeholder icon
+                  Icons.sports_soccer,
                   size: 80,
-                  color: blueColor,
+                  color: Theme.of(context).primaryColor,
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'PlayTN',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: blueColor,
+                    color: Theme.of(context).primaryColor,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 40),
 
-                // Form Fields
+                // Form fields now take their style from the central theme
                 TextFormField(
-                  decoration: _buildInputDecoration(label: 'Username o Email', color: blueColor),
+                  decoration: const InputDecoration(labelText: 'Username o Email'),
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
                   obscureText: true,
-                  decoration: _buildInputDecoration(label: 'Password', color: blueColor),
+                  decoration: const InputDecoration(labelText: 'Password'),
                 ),
                 const SizedBox(height: 40),
 
-                // Login Button
+                // Buttons now take their style from the central theme
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: blueColor,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                  ),
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/home');
                   },
-                  child: const Text(
-                    'Accedi',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                  ),
+                  child: const Text('Accedi'),
                 ),
                 const SizedBox(height: 20),
-
-                // SPID Button
                 TextButton(
                   onPressed: _launchSpidLogin,
-                  child: Text(
-                    'Entra con SPID / CIE',
-                    style: TextStyle(color: blueColor, fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
+                  child: const Text('Entra con SPID / CIE'),
                 ),
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  InputDecoration _buildInputDecoration({required String label, required Color color}) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(color: Colors.black54),
-      filled: true,
-      fillColor: Colors.white.withOpacity(0.7),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: Colors.grey.shade300),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: BorderSide(color: color, width: 2.0),
       ),
     );
   }
