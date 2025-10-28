@@ -23,6 +23,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
+    // Revert to only loading lockers, removing the offline map logic
     _lockersFuture = _lockerService.getLockers();
   }
 
@@ -77,7 +78,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
                                   subtitle: Text('Scompartimento ${compartment.id.toUpperCase()}'),
                                   trailing: ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: isThisCompartmentOpen ? AppTheme.accentColor : AppTheme.primaryColor,
+                                      backgroundColor: isThisCompartmentOpen ? Colors.orange.shade700 : AppTheme.primaryColor,
                                       shape: const CircleBorder(),
                                       padding: const EdgeInsets.all(12),
                                     ),
@@ -127,7 +128,7 @@ class _MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Errore: ${snapshot.error}'));
+            return Center(child: Text("Errore nel caricamento dei dati: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('Nessun locker trovato.'));
           }
