@@ -27,10 +27,7 @@ void main() async {
 class MyApp extends StatefulWidget {
   final bool initialDarkMode;
 
-  const MyApp({
-    super.key,
-    required this.initialDarkMode,
-  });
+  const MyApp({super.key, required this.initialDarkMode});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -73,9 +70,7 @@ class _MyAppState extends State<MyApp> {
         if (_isLoadingInitialData) {
           return const CupertinoApp(
             home: CupertinoPageScaffold(
-              child: Center(
-                child: CupertinoActivityIndicator(),
-              ),
+              child: Center(child: CupertinoActivityIndicator()),
             ),
           );
         }
@@ -121,10 +116,11 @@ class _MyAppState extends State<MyApp> {
         }
 
         return CupertinoApp(
-          title: 'NULL',
+          title: 'UrbanLock',
           theme: CupertinoThemeData(
-            brightness:
-                _themeManager.isDarkMode ? Brightness.dark : Brightness.light,
+            brightness: _themeManager.isDarkMode
+                ? Brightness.dark
+                : Brightness.light,
             primaryColor: const Color(0xFF007AFF),
           ),
           home: initialRoute,

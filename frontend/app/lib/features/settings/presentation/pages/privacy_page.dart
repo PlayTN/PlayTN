@@ -7,10 +7,7 @@ import 'package:app/core/styles/app_text_styles.dart';
 class PrivacyPage extends StatelessWidget {
   final ThemeManager themeManager;
 
-  const PrivacyPage({
-    super.key,
-    required this.themeManager,
-  });
+  const PrivacyPage({super.key, required this.themeManager});
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +20,7 @@ class PrivacyPage extends StatelessWidget {
           backgroundColor: AppColors.background(isDark),
           navigationBar: CupertinoNavigationBar(
             backgroundColor: AppColors.surface(isDark),
-            middle: Text(
-              'Privacy',
-              style: AppTextStyles.title(isDark),
-            ),
+            middle: Text('Privacy', style: AppTextStyles.title(isDark)),
           ),
           child: SafeArea(
             child: SingleChildScrollView(
@@ -86,7 +80,8 @@ class PrivacyPage extends StatelessWidget {
                           isDark: isDark,
                           icon: CupertinoIcons.location,
                           title: 'Condividi posizione',
-                          subtitle: 'Permetti all\'app di utilizzare la tua posizione',
+                          subtitle:
+                              'Permetti all\'app di utilizzare la tua posizione',
                           value: true,
                           onChanged: (value) {
                             // TODO: Salva preferenza
@@ -98,7 +93,8 @@ class PrivacyPage extends StatelessWidget {
                           isDark: isDark,
                           icon: CupertinoIcons.chart_bar,
                           title: 'Analisi utilizzo',
-                          subtitle: 'Aiutaci a migliorare l\'app condividendo dati anonimi',
+                          subtitle:
+                              'Aiutaci a migliorare l\'app condividendo dati anonimi',
                           value: true,
                           onChanged: (value) {
                             // TODO: Salva preferenza
@@ -130,7 +126,7 @@ class PrivacyPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'I tuoi dati personali sono protetti e utilizzati solo per fornirti i servizi dell\'app NULL. Non condividiamo i tuoi dati con terze parti senza il tuo consenso esplicito.',
+                          'I tuoi dati personali sono protetti e utilizzati solo per fornirti i servizi dell\'app UrbanLock. Non condividiamo i tuoi dati con terze parti senza il tuo consenso esplicito.',
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary(isDark),
@@ -179,11 +175,7 @@ class PrivacyPage extends StatelessWidget {
               color: AppColors.iconBackground(isDark),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: AppColors.primary(isDark),
-            ),
+            child: Icon(icon, size: 20, color: AppColors.primary(isDark)),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -199,10 +191,7 @@ class PrivacyPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: AppTextStyles.bodySecondary(isDark),
-                ),
+                Text(subtitle, style: AppTextStyles.bodySecondary(isDark)),
               ],
             ),
           ),
@@ -225,4 +214,3 @@ class PrivacyPage extends StatelessWidget {
     );
   }
 }
-

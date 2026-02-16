@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           const SizedBox(height: 32),
                           Text(
-                            'Benvenuto in NULL',
+                            'Benvenuto in UrbanLock',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -268,4 +268,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

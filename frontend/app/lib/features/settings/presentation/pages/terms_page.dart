@@ -7,10 +7,7 @@ import 'package:app/core/styles/app_text_styles.dart';
 class TermsPage extends StatelessWidget {
   final ThemeManager themeManager;
 
-  const TermsPage({
-    super.key,
-    required this.themeManager,
-  });
+  const TermsPage({super.key, required this.themeManager});
 
   @override
   Widget build(BuildContext context) {
@@ -69,13 +66,13 @@ class TermsPage extends StatelessWidget {
                     isDark: isDark,
                     title: '1. Accettazione dei termini',
                     content:
-                        'Utilizzando l\'app NULL, accetti di rispettare questi termini e condizioni. Se non accetti questi termini, ti preghiamo di non utilizzare l\'app.',
+                        'Utilizzando l\'app UrbanLock, accetti di rispettare questi termini e condizioni. Se non accetti questi termini, ti preghiamo di non utilizzare l\'app.',
                   ),
                   _buildSection(
                     isDark: isDark,
                     title: '2. Utilizzo del servizio',
                     content:
-                        'L\'app NULL è un servizio fornito dal Comune di Trento per la gestione dei lockers pubblici. Il servizio è gratuito per tutti i cittadini di Trento. L\'utilizzo dei lockers è soggetto alla disponibilità delle celle.',
+                        'L\'app UrbanLock è un servizio fornito dal Comune di Trento per la gestione dei lockers pubblici. Il servizio è gratuito per tutti i cittadini di Trento. L\'utilizzo dei lockers è soggetto alla disponibilità delle celle.',
                   ),
                   _buildSection(
                     isDark: isDark,
@@ -107,7 +104,7 @@ class TermsPage extends StatelessWidget {
                     isDark: isDark,
                     title: '6. Contatti',
                     content:
-                        'Per domande o chiarimenti sui termini e condizioni, puoi contattare il supporto all\'indirizzo supporto@null.trento.it o al numero +39 0461 123456.',
+                        'Per domande o chiarimenti sui termini e condizioni, puoi contattare il supporto all\'indirizzo supporto@UrbanLock.trento.it o al numero +39 0461 123456.',
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -161,4 +158,3 @@ class TermsPage extends StatelessWidget {
     return '${now.day}/${now.month}/${now.year}';
   }
 }
-

@@ -7,10 +7,7 @@ import 'package:app/core/styles/app_text_styles.dart';
 class PrivacyPolicyPage extends StatelessWidget {
   final ThemeManager themeManager;
 
-  const PrivacyPolicyPage({
-    super.key,
-    required this.themeManager,
-  });
+  const PrivacyPolicyPage({super.key, required this.themeManager});
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +72,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                     isDark: isDark,
                     title: '2. Dati raccolti',
                     content:
-                        'L\'app NULL raccoglie i seguenti dati personali:\n\n'
+                        'L\'app UrbanLock raccoglie i seguenti dati personali:\n\n'
                         '• Dati di registrazione (nome, email, telefono)\n'
                         '• Dati di utilizzo (storico prenotazioni, celle utilizzate)\n'
                         '• Dati di localizzazione (posizione GPS per trovare i lockers più vicini)\n'
@@ -195,4 +192,3 @@ class PrivacyPolicyPage extends StatelessWidget {
     return '${now.day}/${now.month}/${now.year}';
   }
 }
-

@@ -128,10 +128,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
             backgroundColor: AppColors.surface(isDark),
             automaticallyImplyLeading:
                 false, // Nessuna freccia indietro: accettazione obbligatoria
-            middle: Text(
-              title,
-              style: AppTextStyles.title(isDark),
-            ),
+            middle: Text(title, style: AppTextStyles.title(isDark)),
           ),
           child: SafeArea(
             child: Column(
@@ -153,7 +150,10 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
                 ),
                 // Indicatori di avanzamento (pagine)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surface(isDark),
                     border: Border(
@@ -176,8 +176,9 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
                           decoration: BoxDecoration(
                             color: isActive
                                 ? AppColors.primary(isDark)
-                                : AppColors.textSecondary(isDark)
-                                    .withOpacity(0.3),
+                                : AppColors.textSecondary(
+                                    isDark,
+                                  ).withOpacity(0.3),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         );
@@ -198,8 +199,9 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
     final buttonColor = _termsAccepted
         ? CupertinoColors.systemGreen
         : (canAccept ? AppColors.primary(isDark) : AppColors.surface(isDark));
-    final buttonText =
-        _termsAccepted ? 'Termini accettati' : 'Ho letto e accetto i termini di utilizzo';
+    final buttonText = _termsAccepted
+        ? 'Termini accettati'
+        : 'Ho letto e accetto i termini di utilizzo';
 
     return Padding(
       padding: const EdgeInsets.all(20),
@@ -224,10 +226,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            'Passaggio 1 di 2',
-            style: AppTextStyles.bodySecondary(isDark),
-          ),
+          Text('Passaggio 1 di 2', style: AppTextStyles.bodySecondary(isDark)),
           const SizedBox(height: 16),
           Expanded(
             child: CupertinoScrollbar(
@@ -240,13 +239,13 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
                     _paragraph(
                       isDark,
                       '1. Accettazione dei termini',
-                      'Utilizzando l\'app NULL, accetti di rispettare questi termini e condizioni. '
+                      'Utilizzando l\'app UrbanLock, accetti di rispettare questi termini e condizioni. '
                           'Se non accetti questi termini, ti preghiamo di non utilizzare l\'app.',
                     ),
                     _paragraph(
                       isDark,
                       '2. Utilizzo del servizio',
-                      'L\'app NULL è un servizio fornito dal Comune di Trento per la gestione dei lockers pubblici. '
+                      'L\'app UrbanLock è un servizio fornito dal Comune di Trento per la gestione dei lockers pubblici. '
                           'Il servizio è gratuito per tutti i cittadini di Trento. L\'utilizzo dei lockers è soggetto '
                           'alla disponibilità delle celle.',
                     ),
@@ -278,7 +277,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
                       isDark,
                       '6. Contatti',
                       'Per domande o chiarimenti sui termini e condizioni, puoi contattare il supporto '
-                          'all\'indirizzo supporto@null.trento.it o al numero +39 0461 123456.',
+                          'all\'indirizzo supporto@UrbanLock.trento.it o al numero +39 0461 123456.',
                     ),
                     const SizedBox(height: 24),
                     Center(
@@ -355,10 +354,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
             ],
           ),
           const SizedBox(height: 6),
-          Text(
-            'Passaggio 2 di 2',
-            style: AppTextStyles.bodySecondary(isDark),
-          ),
+          Text('Passaggio 2 di 2', style: AppTextStyles.bodySecondary(isDark)),
           const SizedBox(height: 16),
           Expanded(
             child: CupertinoScrollbar(
@@ -377,7 +373,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
                     _paragraph(
                       isDark,
                       '2. Dati raccolti',
-                      'L\'app NULL raccoglie i seguenti dati personali:\n\n'
+                      'L\'app UrbanLock raccoglie i seguenti dati personali:\n\n'
                           '• Dati di registrazione (nome, email, telefono)\n'
                           '• Dati di utilizzo (storico prenotazioni, celle utilizzate)\n'
                           '• Dati di localizzazione (posizione GPS per trovare i lockers più vicini)\n'
@@ -484,11 +480,7 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
     );
   }
 
-  Widget _paragraph(
-    bool isDark,
-    String title,
-    String content,
-  ) {
+  Widget _paragraph(bool isDark, String title, String content) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: Column(
@@ -516,4 +508,3 @@ class _PrivacyTermsPageState extends State<PrivacyTermsPage> {
     );
   }
 }
-

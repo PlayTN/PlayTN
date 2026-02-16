@@ -34,16 +34,14 @@ import 'package:app/features/notifications/data/repositories/notification_reposi
 class HomePage extends StatefulWidget {
   final ThemeManager themeManager;
 
-  const HomePage({
-    super.key,
-    required this.themeManager,
-  });
+  const HomePage({super.key, required this.themeManager});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin, WidgetsBindingObserver {
+class _HomePageState extends State<HomePage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   int _currentIndex = 1; // Home selezionata di default
   Set<LockerType> _selectedFilters = {}; // Filtri attivi (vuoto = tutti)
   Locker? _selectedLocker; // Locker selezionato per i dettagli
@@ -64,30 +62,30 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
   static const String _lockersCacheKey = 'lockers_cache_v1';
   static const String _userLocationLatKey = 'user_location_lat_v1';
   static const String _userLocationLngKey = 'user_location_lng_v1';
-  
+
   // Stato per i lockers
   List<Locker> _lockers = [];
   bool _isLoading = true;
   String? _errorMessage;
   String _searchQuery = '';
-  
+
   final LockerRepository _lockerRepository = AppDependencies.lockerRepository;
-  
+
   // Controller per la mappa
   final MapController _mapController = MapController();
-  
+
   // Servizio per la geolocalizzazione
   final Location _location = Location();
   bool _locationPermissionGranted = false;
   LatLng? _userLocation; // Posizione dell'utente
-  
+
   // AnimationController per animazioni smooth
   late AnimationController _animationController;
-  
+
   // Stato autenticazione (per ora semplice, poi si può migliorare)
   bool _isAuthenticated = false;
   bool _showProfilePopup = false;
-  
+
   // Dati utente (per ora mock, poi da backend)
   String? _userName;
   String? _userEmail;
@@ -114,14 +112,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     _loadUnreadNotificationsCount();
 
     // Polling periodico per aggiornare il badge notifiche
-    _notificationsTimer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) {
-        if (_isAuthenticated) {
-          _loadUnreadNotificationsCount();
-        }
-      },
-    );
+    _notificationsTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (_isAuthenticated) {
+        _loadUnreadNotificationsCount();
+      }
+    });
   }
 
   @override
@@ -130,7 +125,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     // Ricarica il contatore quando la pagina diventa visibile
     _loadUnreadNotificationsCount();
   }
-  
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
@@ -148,7 +143,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Quando l'app va in background, verifica se ci sono celle aperte
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
       _checkOpenCellsAndNotify();
     }
     if (state == AppLifecycleState.resumed && _isAuthenticated) {
@@ -217,7 +213,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
       });
     }
   }
-  
+
   // Metodo helper per animare lo zoom
   Future<void> _animateToLocation(LatLng target, double zoom) async {
     // Evita accumulo di listeners (causa lag) e doppie animazioni
@@ -234,11 +230,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     final currentZoom = _mapController.camera.zoom;
 
     // Se siamo già praticamente lì, non animare
-    final meters = _distance.as(
-      LengthUnit.Meter,
-      currentCenter,
-      target,
-    );
+    final meters = _distance.as(LengthUnit.Meter, currentCenter, target);
     if (meters < 2 && (currentZoom - zoom).abs() < 0.02) {
       _mapController.move(target, zoom);
       return;
@@ -250,9 +242,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     _mapAnimationListener = () {
       final t = Curves.easeInOutCubic.transform(_animationController.value);
       final lat =
-          currentCenter.latitude + (target.latitude - currentCenter.latitude) * t;
+          currentCenter.latitude +
+          (target.latitude - currentCenter.latitude) * t;
       final lng =
-          currentCenter.longitude + (target.longitude - currentCenter.longitude) * t;
+          currentCenter.longitude +
+          (target.longitude - currentCenter.longitude) * t;
       final z = currentZoom + (zoom - currentZoom) * t;
       _mapController.move(LatLng(lat, lng), z);
     };
@@ -269,7 +263,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
       }
     }
   }
-  
+
   Future<void> _requestLocationPermissionAndZoom() async {
     // 1) Ripristina subito l'ultima posizione nota (UX immediata)
     await _restoreCachedUserLocationAndMoveMap();
@@ -300,7 +294,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
         setState(() {
           _locationPermissionGranted = true;
         });
-        
+
         // Attiva tracking marker utente (senza ricentrare la mappa)
         _startLocationStreamIfPossible();
         // Auto-centering SOLO una volta e solo se l'utente non ha già interagito con la mappa
@@ -313,7 +307,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
       // Mantieni la posizione di default (Trento)
     }
   }
-  
+
   Future<void> _zoomToUserLocation({required bool force}) async {
     try {
       if (!_locationPermissionGranted) return;
@@ -338,9 +332,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
           locationData.latitude!,
           locationData.longitude!,
         );
-        
+
         await _updateUserLocation(userLatLng, animate: false);
-        
+
         // Zoom con animazione smooth
         await _animateToLocation(userLatLng, MapConfig.userLocationZoom);
         _didAutoCenterToUser = true;
@@ -408,17 +402,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     try {
       final prefs = await SharedPreferences.getInstance();
       final payload = lockers
-          .map((l) => {
-                'id': l.id,
-                'name': l.name,
-                'position': {'lat': l.position.latitude, 'lng': l.position.longitude},
-                // LockerType.fromJson usa stringhe backend (sportivi/personali/...), non il nome enum
-                'type': l.type.label.toLowerCase().replaceAll('-', ''),
-                'totalCells': l.totalCells,
-                'availableCells': l.availableCells,
-                'isActive': l.isActive,
-                'description': l.description,
-              })
+          .map(
+            (l) => {
+              'id': l.id,
+              'name': l.name,
+              'position': {
+                'lat': l.position.latitude,
+                'lng': l.position.longitude,
+              },
+              // LockerType.fromJson usa stringhe backend (sportivi/personali/...), non il nome enum
+              'type': l.type.label.toLowerCase().replaceAll('-', ''),
+              'totalCells': l.totalCells,
+              'availableCells': l.availableCells,
+              'isActive': l.isActive,
+              'description': l.description,
+            },
+          )
           .toList();
       await prefs.setString(_lockersCacheKey, jsonEncode(payload));
     } catch (_) {}
@@ -429,7 +428,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     final hasQuery = q.isNotEmpty;
 
     final filtered = _allLockers.where((locker) {
-      final typeOk = _selectedFilters.isEmpty || _selectedFilters.contains(locker.type);
+      final typeOk =
+          _selectedFilters.isEmpty || _selectedFilters.contains(locker.type);
       if (!typeOk) return false;
 
       if (!hasQuery) return true;
@@ -465,7 +465,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     final lat = locker.position.latitude;
     final lng = locker.position.longitude;
     final name = Uri.encodeComponent(locker.name);
-    final uri = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng($name)');
+    final uri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1&query=$lat,$lng($name)',
+    );
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
@@ -516,10 +518,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                 decoration: BoxDecoration(
                   color: AppColors.primary(isDark),
                   shape: BoxShape.circle,
-                  border: Border.all(
-                    color: AppColors.card(isDark),
-                    width: 3,
-                  ),
+                  border: Border.all(color: AppColors.card(isDark), width: 3),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.shadowColor(isDark).withOpacity(0.25),
@@ -569,7 +568,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     } catch (_) {}
   }
 
-  Future<void> _updateUserLocation(LatLng newLoc, {required bool animate}) async {
+  Future<void> _updateUserLocation(
+    LatLng newLoc, {
+    required bool animate,
+  }) async {
     final old = _userLocation;
     // Aggiorna marker solo se cambia davvero (riduce setState e repaint)
     if (old != null) {
@@ -586,7 +588,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
     // Se l'utente sta interagendo con la mappa, non forzare l'animazione
     final gestureAt = _lastMapGestureAt;
     final recentlyGesturing =
-        gestureAt != null && DateTime.now().difference(gestureAt) < const Duration(seconds: 2);
+        gestureAt != null &&
+        DateTime.now().difference(gestureAt) < const Duration(seconds: 2);
     if (!animate || recentlyGesturing) return;
 
     // Non cambiare zoom automaticamente durante tracking; solo centra con animazione leggera
@@ -819,7 +822,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                               width: 22,
                               height: 22,
                               decoration: BoxDecoration(
-                                color: AppColors.primary(isDark).withOpacity(0.2),
+                                color: AppColors.primary(
+                                  isDark,
+                                ).withOpacity(0.2),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -828,7 +833,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                               width: 16,
                               height: 16,
                               decoration: BoxDecoration(
-                                color: AppColors.primary(isDark).withOpacity(0.4),
+                                color: AppColors.primary(
+                                  isDark,
+                                ).withOpacity(0.4),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -911,7 +918,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                 child: CupertinoButton(
                   padding: EdgeInsets.zero,
                   minSize: 0,
-                    onPressed: () => _zoomToUserLocation(force: true),
+                  onPressed: () => _zoomToUserLocation(force: true),
                   child: Container(
                     width: 48,
                     height: 48,
@@ -943,15 +950,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                 final safeAreaTop = MediaQuery.of(context).padding.top;
                 final headerPaddingTop = 12.0;
                 final headerPaddingBottom = 10.0;
-                final headerContentHeight = 56.0; // Altezza del contenuto dell'header (logo + search + profilo)
+                final headerContentHeight =
+                    56.0; // Altezza del contenuto dell'header (logo + search + profilo)
                 final spacing = 8.0; // Spazio tra header e pulsante
-                
+
                 // Calcola la posizione: sotto l'header, allineato a destra
-                final topPosition = safeAreaTop + headerPaddingTop + headerContentHeight + headerPaddingBottom + spacing;
-                
+                final topPosition =
+                    safeAreaTop +
+                    headerPaddingTop +
+                    headerContentHeight +
+                    headerPaddingBottom +
+                    spacing;
+
                 return Positioned(
                   top: topPosition,
-                  right: 16, // Allineato con il profilo utente (stesso padding dell'header)
+                  right:
+                      16, // Allineato con il profilo utente (stesso padding dell'header)
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: BackdropFilter(
@@ -1012,432 +1026,521 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
             },
             child: Column(
               children: [
-              // Header: logo e search+profilo sulla stessa riga
-              SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    right: 16,
-                    top: 12,
-                    bottom: 10,
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(18),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: AppColors.surface(isDark),
-                                    borderRadius: BorderRadius.circular(18),
+                // Header: logo e search+profilo sulla stessa riga
+                SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16,
+                      right: 16,
+                      top: 12,
+                      bottom: 10,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(18),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 10,
+                                    sigmaY: 10,
                                   ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 12,
-                                        ),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            // Logo (quadrato grigio)
-                                            Container(
-                                              width: 32,
-                                              height: 32,
-                                              decoration: BoxDecoration(
-                                                color: AppColors.searchBackground(isDark),
-                                                borderRadius: BorderRadius.circular(8),
+                                  child: DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      color: AppColors.surface(isDark),
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 12,
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              // Logo (quadrato grigio)
+                                              Container(
+                                                width: 32,
+                                                height: 32,
+                                                decoration: BoxDecoration(
+                                                  color:
+                                                      AppColors.searchBackground(
+                                                        isDark,
+                                                      ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            // Barra di ricerca
-                                            Expanded(
-                                              child: CupertinoSearchTextField(
-                                                placeholder: 'Cerca lockers...',
-                                                backgroundColor: CupertinoColors.transparent,
-                                                padding: const EdgeInsets
-                                                    .symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 6,
+                                              const SizedBox(width: 12),
+                                              // Barra di ricerca
+                                              Expanded(
+                                                child: CupertinoSearchTextField(
+                                                  placeholder:
+                                                      'Cerca lockers...',
+                                                  backgroundColor:
+                                                      CupertinoColors
+                                                          .transparent,
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 6,
+                                                      ),
+                                                  prefixIcon: Icon(
+                                                    CupertinoIcons.search,
+                                                    size: 18,
+                                                    color:
+                                                        AppColors.textSecondary(
+                                                          isDark,
+                                                        ),
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: AppColors.text(
+                                                      isDark,
+                                                    ),
+                                                  ),
+                                                  placeholderStyle: TextStyle(
+                                                    color:
+                                                        AppColors.textSecondary(
+                                                          isDark,
+                                                        ),
+                                                  ),
+                                                  onChanged: (value) {
+                                                    _onSearchChanged(value);
+                                                  },
+                                                  onTap: () {
+                                                    setState(() {
+                                                      _showCategoryFilters =
+                                                          true;
+                                                    });
+                                                  },
                                                 ),
-                                                prefixIcon: Icon(
-                                                  CupertinoIcons.search,
-                                                  size: 18,
-                                                  color: AppColors.textSecondary(
-                                                      isDark),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              // Profilo utente
+                                              CupertinoButton(
+                                                padding: EdgeInsets.zero,
+                                                minSize: 32,
+                                                child: Icon(
+                                                  CupertinoIcons
+                                                      .person_crop_circle,
+                                                  size: 30,
+                                                  color: AppColors.logoText(
+                                                    isDark,
+                                                  ),
                                                 ),
-                                                style: TextStyle(
-                                                  color: AppColors.text(isDark),
-                                                ),
-                                                placeholderStyle: TextStyle(
-                                                  color: AppColors.textSecondary(
-                                                      isDark),
-                                                ),
-                                                onChanged: (value) {
-                                                  _onSearchChanged(value);
-                                                },
-                                                onTap: () {
+                                                onPressed: () {
                                                   setState(() {
-                                                    _showCategoryFilters = true;
+                                                    _showProfilePopup =
+                                                        !_showProfilePopup;
                                                   });
                                                 },
                                               ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            // Profilo utente
-                                            CupertinoButton(
-                                              padding: EdgeInsets.zero,
-                                              minSize: 32,
-                                              child: Icon(
-                                                CupertinoIcons
-                                                    .person_crop_circle,
-                                                size: 30,
-                                                color: AppColors.logoText(
-                                                    isDark),
-                                              ),
-                                              onPressed: () {
-                                                setState(() {
-                                                  _showProfilePopup = !_showProfilePopup;
-                                                });
-                                              },
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      // Filtri categoria (mostrati dentro la barra di ricerca)
-                                      if (_showCategoryFilters)
-                                        Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              12, 0, 12, 10),
-                                          child: SingleChildScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            child: Row(
-                                              children: LockerType.values
-                                                  .map((type) {
-                                                final isSelected =
-                                                    _selectedFilters
-                                                        .contains(type);
-                                                return Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      right: 8),
-                                                  child: CupertinoButton(
-                                                    padding:
-                                                        const EdgeInsets
-                                                            .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 6,
-                                                    ),
-                                                    minSize: 0,
-                                                    onPressed: () {
-                                                      _filterByType(
-                                                          type, isSelected);
-                                                    },
-                                                    child: Container(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                        horizontal: 12,
-                                                        vertical: 8,
-                                                      ),
-                                                      decoration: BoxDecoration(
-                                                        color: isSelected
-                                                            ? AppColors.primary(
-                                                                isDark)
-                                                            : AppColors.surface(
-                                                                isDark),
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        border: Border.all(
-                                                          color: isSelected
-                                                              ? AppColors
-                                                                  .primary(
-                                                                      isDark)
-                                                              : AppColors
-                                                                  .borderSecondary(
-                                                                      isDark),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          Icon(
-                                                            type.icon,
-                                                            size: 16,
-                                                            color: isSelected
-                                                                ? CupertinoColors
-                                                                    .white
-                                                                : AppColors.text(
-                                                                    isDark),
-                                                          ),
-                                                          const SizedBox(
-                                                              width: 6),
-                                                          Text(
-                                                            type.label,
-                                                            style: TextStyle(
-                                                              fontSize: 12,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                              color: isSelected
-                                                                  ? CupertinoColors
-                                                                      .white
-                                                                  : AppColors
-                                                                      .text(
-                                                                          isDark),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
+                                            ],
                                           ),
                                         ),
+                                        // Filtri categoria (mostrati dentro la barra di ricerca)
+                                        if (_showCategoryFilters)
+                                          Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                              12,
+                                              0,
+                                              12,
+                                              10,
+                                            ),
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Row(
+                                                children: LockerType.values.map((
+                                                  type,
+                                                ) {
+                                                  final isSelected =
+                                                      _selectedFilters.contains(
+                                                        type,
+                                                      );
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                          right: 8,
+                                                        ),
+                                                    child: CupertinoButton(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                            vertical: 6,
+                                                          ),
+                                                      minSize: 0,
+                                                      onPressed: () {
+                                                        _filterByType(
+                                                          type,
+                                                          isSelected,
+                                                        );
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 12,
+                                                              vertical: 8,
+                                                            ),
+                                                        decoration: BoxDecoration(
+                                                          color: isSelected
+                                                              ? AppColors.primary(
+                                                                  isDark,
+                                                                )
+                                                              : AppColors.surface(
+                                                                  isDark,
+                                                                ),
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                20,
+                                                              ),
+                                                          border: Border.all(
+                                                            color: isSelected
+                                                                ? AppColors.primary(
+                                                                    isDark,
+                                                                  )
+                                                                : AppColors.borderSecondary(
+                                                                    isDark,
+                                                                  ),
+                                                          ),
+                                                        ),
+                                                        child: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Icon(
+                                                              type.icon,
+                                                              size: 16,
+                                                              color: isSelected
+                                                                  ? CupertinoColors
+                                                                        .white
+                                                                  : AppColors.text(
+                                                                      isDark,
+                                                                    ),
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 6,
+                                                            ),
+                                                            Text(
+                                                              type.label,
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                                color:
+                                                                    isSelected
+                                                                    ? CupertinoColors
+                                                                          .white
+                                                                    : AppColors.text(
+                                                                        isDark,
+                                                                      ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                // Card bottom premium: transizione smooth tra "info" e "locker selezionato"
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 240),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      final slide = Tween<Offset>(
+                        begin: const Offset(0, 0.08),
+                        end: Offset.zero,
+                      ).animate(animation);
+                      return FadeTransition(
+                        opacity: animation,
+                        child: SlideTransition(position: slide, child: child),
+                      );
+                    },
+                    child: _selectedLocker != null
+                        ? ClipRRect(
+                            key: ValueKey<String>(
+                              'selected-${_selectedLocker!.id}',
+                            ),
+                            borderRadius: BorderRadius.circular(18),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface(isDark),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Popup minimal: titolo + tipo + chiudi
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  _selectedLocker!.name,
+                                                  style:
+                                                      AppTextStyles.title(
+                                                        isDark,
+                                                      ).copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                      ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  _selectedLocker!.type.label,
+                                                  style:
+                                                      AppTextStyles.bodySecondary(
+                                                        isDark,
+                                                      ).copyWith(fontSize: 13),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          CupertinoButton(
+                                            padding: EdgeInsets.zero,
+                                            minSize: 0,
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedLocker = null;
+                                              });
+                                            },
+                                            child: const Icon(
+                                              CupertinoIcons.xmark_circle_fill,
+                                              size: 24,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      // Info essenziali: distanza + disponibilità
+                                      Builder(
+                                        builder: (_) {
+                                          final distMeters =
+                                              _distanceToLockerMeters(
+                                                _selectedLocker!,
+                                              );
+                                          final distLabel = distMeters == null
+                                              ? null
+                                              : _formatDistance(distMeters);
+                                          final available =
+                                              _selectedLocker!.availableCells;
+                                          final total =
+                                              _selectedLocker!.totalCells;
+                                          final color = _availabilityColor(
+                                            isDark,
+                                            available,
+                                            total,
+                                          );
+                                          final availabilityText = total > 0
+                                              ? '$available/$total disponibili'
+                                              : '$available disponibili';
+
+                                          return Row(
+                                            children: [
+                                              if (distLabel != null) ...[
+                                                Icon(
+                                                  CupertinoIcons.location,
+                                                  size: 14,
+                                                  color:
+                                                      AppColors.textSecondary(
+                                                        isDark,
+                                                      ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  distLabel,
+                                                  style:
+                                                      AppTextStyles.bodySecondary(
+                                                        isDark,
+                                                      ).copyWith(fontSize: 13),
+                                                ),
+                                                const SizedBox(width: 12),
+                                              ],
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 10,
+                                                      vertical: 6,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: color.withOpacity(
+                                                    0.12,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        999,
+                                                      ),
+                                                  border: Border.all(
+                                                    color: color.withOpacity(
+                                                      0.22,
+                                                    ),
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Icon(
+                                                      CupertinoIcons.lock_fill,
+                                                      size: 14,
+                                                      color: color,
+                                                    ),
+                                                    const SizedBox(width: 6),
+                                                    Text(
+                                                      availabilityText,
+                                                      style: TextStyle(
+                                                        fontSize: 12.5,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        color: color,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      ),
+                                      const SizedBox(height: 12),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: CupertinoButton.filled(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 14,
+                                            vertical: 10,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).push(
+                                              CupertinoPageRoute(
+                                                builder: (context) =>
+                                                    LockerDetailPage(
+                                                      themeManager:
+                                                          widget.themeManager,
+                                                      locker: _selectedLocker!,
+                                                      isAuthenticated:
+                                                          _isAuthenticated,
+                                                      onAuthenticationChanged:
+                                                          (isAuthenticated) {
+                                                            setState(() {
+                                                              _isAuthenticated =
+                                                                  isAuthenticated;
+                                                            });
+                                                          },
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: const [
+                                              Icon(
+                                                CupertinoIcons.chevron_right,
+                                                size: 18,
+                                              ),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Dettagli',
+                                                style: TextStyle(
+                                                  color: CupertinoColors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        : ClipRRect(
+                            key: const ValueKey<String>('info-card'),
+                            borderRadius: BorderRadius.circular(18),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface(isDark),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        CupertinoIcons.location_solid,
+                                        color: AppColors.primary(isDark),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          _isLoading
+                                              ? 'Caricamento lockers...'
+                                              : 'Area corrente: Trento\n${_lockers.length} lockers disponibili. Tocca un marker per i dettagli.',
+                                          style: TextStyle(
+                                            color: AppColors.text(isDark),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                    ],
                   ),
                 ),
-              ),
-              const Spacer(),
-              // Card bottom premium: transizione smooth tra "info" e "locker selezionato"
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 240),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeInCubic,
-                  transitionBuilder: (child, animation) {
-                    final slide = Tween<Offset>(
-                      begin: const Offset(0, 0.08),
-                      end: Offset.zero,
-                    ).animate(animation);
-                    return FadeTransition(
-                      opacity: animation,
-                      child: SlideTransition(position: slide, child: child),
-                    );
-                  },
-                  child: _selectedLocker != null
-                      ? ClipRRect(
-                          key: ValueKey<String>('selected-${_selectedLocker!.id}'),
-                          borderRadius: BorderRadius.circular(18),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.surface(isDark),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    // Popup minimal: titolo + tipo + chiudi
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                _selectedLocker!.name,
-                                                style: AppTextStyles.title(isDark).copyWith(
-                                                  fontWeight: FontWeight.w700,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              const SizedBox(height: 2),
-                                              Text(
-                                                _selectedLocker!.type.label,
-                                                style: AppTextStyles.bodySecondary(isDark).copyWith(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        CupertinoButton(
-                                          padding: EdgeInsets.zero,
-                                          minSize: 0,
-                                          onPressed: () {
-                                            setState(() {
-                                              _selectedLocker = null;
-                                            });
-                                          },
-                                          child: const Icon(
-                                            CupertinoIcons.xmark_circle_fill,
-                                            size: 24,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 10),
-                                    // Info essenziali: distanza + disponibilità
-                                    Builder(
-                                      builder: (_) {
-                                        final distMeters = _distanceToLockerMeters(_selectedLocker!);
-                                        final distLabel = distMeters == null ? null : _formatDistance(distMeters);
-                                        final available = _selectedLocker!.availableCells;
-                                        final total = _selectedLocker!.totalCells;
-                                        final color = _availabilityColor(isDark, available, total);
-                                        final availabilityText = total > 0
-                                            ? '$available/$total disponibili'
-                                            : '$available disponibili';
-
-                                        return Row(
-                                          children: [
-                                            if (distLabel != null) ...[
-                                              Icon(
-                                                CupertinoIcons.location,
-                                                size: 14,
-                                                color: AppColors.textSecondary(isDark),
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Text(
-                                                distLabel,
-                                                style: AppTextStyles.bodySecondary(isDark).copyWith(
-                                                  fontSize: 13,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                            ],
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                              decoration: BoxDecoration(
-                                                color: color.withOpacity(0.12),
-                                                borderRadius: BorderRadius.circular(999),
-                                                border: Border.all(
-                                                  color: color.withOpacity(0.22),
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Icon(CupertinoIcons.lock_fill, size: 14, color: color),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    availabilityText,
-                                                    style: TextStyle(
-                                                      fontSize: 12.5,
-                                                      fontWeight: FontWeight.w700,
-                                                      color: color,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                    const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: double.infinity,
-                                      child: CupertinoButton.filled(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 14,
-                                          vertical: 10,
-                                        ),
-                                        borderRadius: BorderRadius.circular(14),
-                                        onPressed: () {
-                                          Navigator.of(context).push(
-                                            CupertinoPageRoute(
-                                              builder: (context) => LockerDetailPage(
-                                                themeManager: widget.themeManager,
-                                                locker: _selectedLocker!,
-                                                isAuthenticated: _isAuthenticated,
-                                                onAuthenticationChanged: (isAuthenticated) {
-                                                  setState(() {
-                                                    _isAuthenticated = isAuthenticated;
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: const [
-                                            Icon(CupertinoIcons.chevron_right, size: 18),
-                                            SizedBox(width: 8),
-                                            Text(
-                                              'Dettagli',
-                                              style: TextStyle(
-                                                color: CupertinoColors.white,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      : ClipRRect(
-                          key: const ValueKey<String>('info-card'),
-                          borderRadius: BorderRadius.circular(18),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: AppColors.surface(isDark),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      CupertinoIcons.location_solid,
-                                      color: AppColors.primary(isDark),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        _isLoading
-                                            ? 'Caricamento lockers...'
-                                            : 'Area corrente: Trento\n${_lockers.length} lockers disponibili. Tocca un marker per i dettagli.',
-                                        style: TextStyle(
-                                          color: AppColors.text(isDark),
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                ),
-              ),
-            ],
+              ],
             ),
           ),
           // Popup profilo utente (posizionato alla fine per essere sopra tutto)
@@ -1450,9 +1553,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                     _showProfilePopup = false;
                   });
                 },
-                child: Container(
-                  color: Colors.transparent,
-                ),
+                child: Container(color: Colors.transparent),
               ),
             ),
           if (_showProfilePopup)
@@ -1461,13 +1562,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                 final safeAreaTop = MediaQuery.of(context).padding.top;
                 final screenHeight = MediaQuery.of(context).size.height;
                 // Calcola dinamicamente l'altezza dell'header
-                final headerContentHeight = (screenHeight * 0.08).clamp(56.0, 80.0);
+                final headerContentHeight = (screenHeight * 0.08).clamp(
+                  56.0,
+                  80.0,
+                );
                 final headerPaddingTop = 12.0;
                 final headerPaddingBottom = 10.0;
                 final spacing = 10.0;
-                
+
                 return Positioned(
-                  top: safeAreaTop + headerPaddingTop + headerContentHeight + headerPaddingBottom + spacing,
+                  top:
+                      safeAreaTop +
+                      headerPaddingTop +
+                      headerContentHeight +
+                      headerPaddingBottom +
+                      spacing,
                   right: 16, // Allineato con il pulsante profilo
                   child: ProfilePopup(
                     themeManager: widget.themeManager,
@@ -1520,71 +1629,68 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                       });
                       await _loadUnreadNotificationsCount();
                     },
-                  onHistoryTap: () {
-                    setState(() {
-                      _showProfilePopup = false;
-                    });
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => HistoryPage(
-                          themeManager: widget.themeManager,
+                    onHistoryTap: () {
+                      setState(() {
+                        _showProfilePopup = false;
+                      });
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) =>
+                              HistoryPage(themeManager: widget.themeManager),
                         ),
-                      ),
-                    );
-                  },
-                  onActiveReservationsTap: () {
-                    setState(() {
-                      _showProfilePopup = false;
-                    });
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => ActiveReservationsPage(
-                          themeManager: widget.themeManager,
+                      );
+                    },
+                    onActiveReservationsTap: () {
+                      setState(() {
+                        _showProfilePopup = false;
+                      });
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => ActiveReservationsPage(
+                            themeManager: widget.themeManager,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  onDonateTap: () {
-                    setState(() {
-                      _showProfilePopup = false;
-                    });
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => DonatePage(
-                          themeManager: widget.themeManager,
+                      );
+                    },
+                    onDonateTap: () {
+                      setState(() {
+                        _showProfilePopup = false;
+                      });
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) =>
+                              DonatePage(themeManager: widget.themeManager),
                         ),
-                      ),
-                    );
-                  },
-                  onHelpTap: () {
-                    setState(() {
-                      _showProfilePopup = false;
-                    });
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => HelpPage(
-                          themeManager: widget.themeManager,
+                      );
+                    },
+                    onHelpTap: () {
+                      setState(() {
+                        _showProfilePopup = false;
+                      });
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) =>
+                              HelpPage(themeManager: widget.themeManager),
                         ),
-                      ),
-                    );
-                  },
-                  onReportsTap: () {
-                    setState(() {
-                      _showProfilePopup = false;
-                    });
-                    Navigator.of(context).push(
-                      CupertinoPageRoute(
-                        builder: (context) => ReportsListPage(
-                          themeManager: widget.themeManager,
+                      );
+                    },
+                    onReportsTap: () {
+                      setState(() {
+                        _showProfilePopup = false;
+                      });
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          builder: (context) => ReportsListPage(
+                            themeManager: widget.themeManager,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );
+                      );
+                    },
+                  ),
+                );
               },
             ),
-          ],
+        ],
       ),
     );
   }
@@ -1592,7 +1698,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
   @override
   Widget build(BuildContext context) {
     final isDark = widget.themeManager.isDarkMode;
-    
+
     return ListenableBuilder(
       listenable: widget.themeManager,
       builder: (context, _) {
@@ -1636,7 +1742,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                             // Se si clicca su Home, reset zoom al default con animazione
                             if (index == 1) {
                               _animateToLocation(
-                                const LatLng(MapConfig.centerLat, MapConfig.centerLng),
+                                const LatLng(
+                                  MapConfig.centerLat,
+                                  MapConfig.centerLng,
+                                ),
                                 MapConfig.defaultZoom,
                               );
                               // L'utente ha scelto esplicitamente dove guardare: non auto-centrare più
@@ -1648,7 +1757,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                               icon: Stack(
                                 children: [
                                   const Icon(CupertinoIcons.bell),
-                                  if (_isAuthenticated && _unreadNotificationsCount > 0)
+                                  if (_isAuthenticated &&
+                                      _unreadNotificationsCount > 0)
                                     Positioned(
                                       right: 0,
                                       top: 0,
@@ -1692,9 +1802,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
                           activeColor: AppColors.bottomBarActive(isDark),
                           inactiveColor: AppColors.bottomBarInactive(isDark),
                           border: const Border(
-                            top: BorderSide(
-                              color: CupertinoColors.transparent,
-                            ),
+                            top: BorderSide(color: CupertinoColors.transparent),
                           ),
                         ),
                       ),
@@ -1708,16 +1816,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
       },
     );
   }
-  
+
   // Metodi helper per i dialog
-  void _showComingSoonDialog(BuildContext context, bool isDark, String feature) {
+  void _showComingSoonDialog(
+    BuildContext context,
+    bool isDark,
+    String feature,
+  ) {
     showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-        title: Text(
-          feature,
-          style: TextStyle(color: AppColors.text(isDark)),
-        ),
+        title: Text(feature, style: TextStyle(color: AppColors.text(isDark))),
         content: Text(
           'Questa funzionalità sarà disponibile a breve.',
           style: TextStyle(color: AppColors.textSecondary(isDark)),
@@ -1731,7 +1840,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
       ),
     );
   }
-  
+
   void _showAboutDialog(BuildContext context, bool isDark) {
     showCupertinoDialog(
       context: context,
@@ -1745,7 +1854,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin, Widg
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'NULL',
+              'UrbanLock',
               style: TextStyle(
                 color: AppColors.text(isDark),
                 fontWeight: FontWeight.bold,

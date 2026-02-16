@@ -27,7 +27,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final LocalizationManager _localizationManager = LocalizationManager();
-  
+
   // Impostazioni notifiche (mock - in produzione verranno salvate in SharedPreferences)
   bool _notificationsEnabled = true;
   bool _pushNotificationsEnabled = true;
@@ -44,10 +44,7 @@ class _SettingsPageState extends State<SettingsPage> {
           backgroundColor: AppColors.background(isDark),
           navigationBar: CupertinoNavigationBar(
             backgroundColor: AppColors.surface(isDark),
-            middle: Text(
-              t('settings'),
-              style: AppTextStyles.title(isDark),
-            ),
+            middle: Text(t('settings'), style: AppTextStyles.title(isDark)),
           ),
           child: SafeArea(
             bottom: false,
@@ -77,7 +74,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         isDark: isDark,
                         icon: CupertinoIcons.moon_fill,
                         title: t('dark_mode'),
-                        subtitle: isDark ? t('dark_mode_active') : t('dark_mode_inactive'),
+                        subtitle: isDark
+                            ? t('dark_mode_active')
+                            : t('dark_mode_inactive'),
                         trailing: CupertinoSwitch(
                           value: isDark,
                           onChanged: (value) {
@@ -221,9 +220,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             CupertinoPageRoute(
-                              builder: (context) => TermsPage(
-                                themeManager: widget.themeManager,
-                              ),
+                              builder: (context) =>
+                                  TermsPage(themeManager: widget.themeManager),
                             ),
                           );
                         },
@@ -286,9 +284,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         onTap: () {
                           Navigator.of(context).push(
                             CupertinoPageRoute(
-                              builder: (context) => HelpPage(
-                                themeManager: widget.themeManager,
-                              ),
+                              builder: (context) =>
+                                  HelpPage(themeManager: widget.themeManager),
                             ),
                           );
                         },
@@ -338,7 +335,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         isDark: isDark,
                         icon: CupertinoIcons.globe,
                         title: t('language'),
-                        subtitle: _localizationManager.getLanguageName(_localizationManager.currentLocale.languageCode),
+                        subtitle: _localizationManager.getLanguageName(
+                          _localizationManager.currentLocale.languageCode,
+                        ),
                         trailing: const Icon(
                           CupertinoIcons.chevron_right,
                           size: 18,
@@ -414,18 +413,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: AppTextStyles.bodySecondary(isDark),
-                    ),
+                    Text(subtitle, style: AppTextStyles.bodySecondary(isDark)),
                   ],
                 ],
               ),
             ),
-            if (trailing != null) ...[
-              const SizedBox(width: 8),
-              trailing,
-            ],
+            if (trailing != null) ...[const SizedBox(width: 8), trailing],
           ],
         ),
       ),
@@ -446,10 +439,10 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context) => CupertinoAlertDialog(
         title: const Text('Informazioni'),
         content: const Text(
-          'NULL - App per la gestione dei lockers\n\n'
+          'UrbanLock - App per la gestione dei lockers\n\n'
           'Versione: 1.0.0\n'
           'Sviluppato per il Comune di Trento\n\n'
-          '© 2024 NULL. Tutti i diritti riservati.',
+          '© 2024 UrbanLock. Tutti i diritti riservati.',
         ),
         actions: [
           CupertinoDialogAction(

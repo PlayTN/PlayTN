@@ -8,10 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 class HelpPage extends StatelessWidget {
   final ThemeManager themeManager;
 
-  const HelpPage({
-    super.key,
-    required this.themeManager,
-  });
+  const HelpPage({super.key, required this.themeManager});
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +68,7 @@ class HelpPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Domande frequenti
                 Text(
                   'DOMANDE FREQUENTI',
@@ -151,7 +148,7 @@ class HelpPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Contatti e supporto
                 Text(
                   'CONTATTI E SUPPORTO',
@@ -175,11 +172,11 @@ class HelpPage extends StatelessWidget {
                         isDark: isDark,
                         icon: CupertinoIcons.mail,
                         title: 'Email supporto',
-                        subtitle: 'supporto@null.trento.it',
+                        subtitle: 'supporto@UrbanLock.trento.it',
                         onTap: () async {
                           final Uri emailUri = Uri(
                             scheme: 'mailto',
-                            path: 'supporto@null.trento.it',
+                            path: 'supporto@UrbanLock.trento.it',
                           );
                           if (await canLaunchUrl(emailUri)) {
                             await launchUrl(emailUri);
@@ -222,9 +219,8 @@ class HelpPage extends StatelessWidget {
                         onTap: () {
                           Navigator.of(context).push(
                             CupertinoPageRoute(
-                              builder: (context) => ReportIssuePage(
-                                themeManager: themeManager,
-                              ),
+                              builder: (context) =>
+                                  ReportIssuePage(themeManager: themeManager),
                             ),
                           );
                         },
@@ -234,7 +230,7 @@ class HelpPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Informazioni aggiuntive
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -333,7 +329,9 @@ class HelpPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    answer.length > 80 ? '${answer.substring(0, 80)}...' : answer,
+                    answer.length > 80
+                        ? '${answer.substring(0, 80)}...'
+                        : answer,
                     style: AppTextStyles.bodySecondary(isDark),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -377,26 +375,16 @@ class HelpPage extends StatelessWidget {
                 color: AppColors.iconBackground(isDark),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 20,
-                color: AppColors.primary(isDark),
-              ),
+              child: Icon(icon, size: 20, color: AppColors.primary(isDark)),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.body(isDark),
-                  ),
+                  Text(title, style: AppTextStyles.body(isDark)),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: AppTextStyles.bodySecondary(isDark),
-                  ),
+                  Text(subtitle, style: AppTextStyles.bodySecondary(isDark)),
                 ],
               ),
             ),
@@ -462,7 +450,7 @@ class FAQDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Domanda
                   Text(
                     question,
@@ -473,7 +461,7 @@ class FAQDetailPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Risposta
                   Container(
                     padding: const EdgeInsets.all(20),
