@@ -20,7 +20,6 @@ import { getAllReports } from './reportAdminController.js';
 /**
  * POST /api/v1/admin/login
  * Login operatore
- * RF13: Login operatore
  */
 export async function adminLogin(req, res, next) {
   try {
@@ -102,7 +101,6 @@ export async function adminLogin(req, res, next) {
 /**
  * GET /api/v1/admin/dashboard
  * Dashboard operatore
- * RF13: Dashboard operatore
  */
 export async function getDashboard(req, res, next) {
   try {
@@ -324,7 +322,6 @@ export async function getDashboard(req, res, next) {
 /**
  * GET /api/v1/admin/map
  * Mappa lato operatore
- * RF13: Mappa lato operatore
  */
 export async function getAdminMap(req, res, next) {
   try {
@@ -377,7 +374,6 @@ export async function getAdminMap(req, res, next) {
 /**
  * GET /api/v1/admin/interventions
  * Interventi manutentivi
- * RF13: Interventi manutentivi
  */
 export async function getInterventions(req, res, next) {
   try {
@@ -486,7 +482,6 @@ export async function getInterventions(req, res, next) {
 /**
  * GET /api/v1/admin/donations
  * Pagina donazioni
- * RF13: Pagina donazioni
  */
 export async function getAdminDonations(req, res, next) {
   try {
@@ -501,7 +496,6 @@ export async function getAdminDonations(req, res, next) {
 /**
  * GET /api/v1/admin/tickets
  * Pagina ticket/segnalazioni
- * RF13: Pagina ticket/segnalazioni
  */
 export async function getAdminTickets(req, res, next) {
   try {
@@ -516,7 +510,6 @@ export async function getAdminTickets(req, res, next) {
 /**
  * GET /api/v1/admin/reporting
  * Pagina reportistica
- * RF13: Pagina reportistica
  */
 export async function getAdminReporting(req, res, next) {
   try {
