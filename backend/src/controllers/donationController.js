@@ -64,7 +64,6 @@ async function formatDonationResponse(donazione, options = {}) {
 /**
  * POST /api/v1/donations
  * Creare donazione
- * RF6: Creare donazione
  */
 export async function createDonation(req, res, next) {
   try {
@@ -190,7 +189,6 @@ export async function createDonation(req, res, next) {
 /**
  * GET /api/v1/donations
  * Lista donazioni utente
- * RF6: Lista donazioni utente
  */
 export async function getDonations(req, res, next) {
   try {
@@ -277,7 +275,6 @@ export async function getDonations(req, res, next) {
 /**
  * GET /api/v1/donations/:id
  * Dettaglio donazione
- * RF6: Dettaglio donazione
  */
 export async function getDonationById(req, res, next) {
   try {
@@ -316,7 +313,6 @@ export async function getDonationById(req, res, next) {
 /**
  * PUT /api/v1/donations/:id
  * Modificare donazione
- * RF6: Modificare donazione
  */
 export async function updateDonation(req, res, next) {
   try {
@@ -412,7 +408,6 @@ export async function updateDonation(req, res, next) {
 /**
  * DELETE /api/v1/donations/:id
  * Cancellare donazione
- * RF6: Cancellare donazione
  */
 export async function deleteDonation(req, res, next) {
   try {
@@ -468,7 +463,6 @@ export async function deleteDonation(req, res, next) {
 /**
  * POST /api/v1/donations/:id/schedule-pickup
  * Concordare data/orario ritiro
- * RF6: Concordare data/orario ritiro
  */
 export async function schedulePickup(req, res, next) {
   try {
