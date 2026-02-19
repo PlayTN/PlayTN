@@ -212,7 +212,6 @@ async function formattaDepositResponse(noleggio, options = {}) {
 /**
  * POST /api/v1/deposits
  * Crea nuovo deposito
- * RF3: Creazione deposito con registrazione automatica
  */
 export async function createDeposit(req, res, next) {
   try {
@@ -315,7 +314,6 @@ export async function createDeposit(req, res, next) {
     cell.stato = 'occupata';
     await cell.save();
 
-    // RF5: Notifica apertura cella
     try {
       await notifyAperturaChiusura(
         userObjectId,
@@ -348,7 +346,6 @@ export async function createDeposit(req, res, next) {
 /**
  * GET /api/v1/deposits/active
  * Lista depositi attivi utente
- * RF3: Gestione depositi attivi
  */
 export async function getActiveDeposits(req, res, next) {
   try {
@@ -397,7 +394,6 @@ export async function getActiveDeposits(req, res, next) {
 /**
  * PUT /api/v1/deposits/:id/end
  * Termina deposito (ritiro)
- * RF3: Terminazione deposito
  */
 export async function endDeposit(req, res, next) {
   try {
@@ -482,7 +478,6 @@ export async function endDeposit(req, res, next) {
 /**
  * PUT /api/v1/deposits/:id/extend
  * Estende durata deposito
- * RF3: Estensione durata deposito
  */
 export async function extendDeposit(req, res, next) {
   try {
@@ -560,26 +555,6 @@ export async function extendDeposit(req, res, next) {
 /**
  * POST /api/v1/deposits/payments
  * Processa pagamento per deposito (mock)
- * RF3: Processamento pagamento (mock)
- * 
- * **SICUREZZA - TUTTI I CONTROLLI CRITICI SONO LATO BACKEND:**
- * - Verifica che locker e cella esistano
- * - Verifica che cella sia di tipo "deposito"
- * - Verifica che cella sia disponibile (stato "libera")
- * - Calcola costo basato su tariffe e durata
- * - Valida importo pagamento
- * - Crea deposito solo dopo pagamento riuscito
- * 
- * **Body:**
- * - `lockerId` (obbligatorio): ID del locker
- * - `cellId` (obbligatorio): ID della cella
- * - `duration` (obbligatorio): Durata in ore
- * - `amount` (opzionale): Importo pagamento (se non specificato, calcolato dal backend)
- * - `paymentMethod` (opzionale): Metodo pagamento (default: 'mock_card')
- * - `depositId` (opzionale): ID deposito esistente (se pagamento per deposito già creato)
- * 
- * **NOTA:** Nessuna transazione bancaria reale, nessun dato sensibile
- * In produzione, questo endpoint integrerà un gateway di pagamento reale (Stripe, PayPal, ecc.)
  */
 export async function processPayment(req, res, next) {
   try {
@@ -716,8 +691,6 @@ export async function processPayment(req, res, next) {
     }
 
     // ========== PROCESSA PAGAMENTO MOCK ==========
-    // ⚠️ SOLO PER TESTING/DEVELOPMENT: Simula pagamento
-    // IN PRODUZIONE: Integrare gateway di pagamento reale (Stripe, PayPal, ecc.)
     const paymentIdForMock = depositId || `${lockerId}-${cell?.cellaId || 'auto'}-${Date.now()}`;
     const paymentResult = await processMockPayment(paymentAmount, paymentMethod, paymentIdForMock);
 
