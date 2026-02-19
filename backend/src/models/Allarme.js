@@ -80,7 +80,6 @@ const allarmeSchema = new mongoose.Schema(
 );
 
 // Index per performance
-// Nota: allarmeId, lockerId, sensoreId, tipo, severita, stato, dataCreazione hanno già index: true nel campo
 // Manteniamo solo gli indici composti necessari
 allarmeSchema.index({ lockerId: 1, stato: 1 });
 allarmeSchema.index({ tipo: 1, severita: 1 });
