@@ -166,7 +166,6 @@ function formatAvailableBorrowResponse(cell, locker) {
 /**
  * GET /api/v1/borrows/available
  * Visualizza oggetti disponibili per prestito
- * RF3: Visualizzazione oggetti disponibili per prestito
  */
 export async function getAvailableBorrows(req, res, next) {
   try {
@@ -232,8 +231,6 @@ export async function getAvailableBorrows(req, res, next) {
 /**
  * POST /api/v1/borrows
  * Richiedere prestito oggetto
- * RF3: Creazione prestito con registrazione automatica
- * RF4: Richiesta prestito oggetto
  */
 export async function createBorrow(req, res, next) {
   try {
@@ -365,8 +362,6 @@ export async function createBorrow(req, res, next) {
 /**
  * POST /api/v1/borrows/:id/return
  * Restituire oggetto
- * RF3: Restituzione prestito
- * RF4: Restituzione vano con verifica foto obbligatoria
  */
 export async function returnBorrow(req, res, next) {
   try {
@@ -403,7 +398,6 @@ export async function returnBorrow(req, res, next) {
       throw new NotFoundError(`Cella ${noleggio.cellaId} non trovata`);
     }
 
-    // RF4: Verifica foto obbligatoria se cella richiede_foto === true
     let fotoUrl = null;
     if (cell.richiede_foto === true) {
       if (!photo) {
@@ -438,7 +432,7 @@ export async function returnBorrow(req, res, next) {
 
     // Formatta risposta
     const borrowResponse = await formatBorrowResponse(noleggio, {
-      tipoOggetto: null, // Non salvato nel modello, ma potrebbe essere esteso
+      tipoOggetto: null,
       descrizione: null,
       photoUrl: fotoUrl || null,
     });
@@ -461,8 +455,6 @@ export async function returnBorrow(req, res, next) {
 /**
  * GET /api/v1/borrows/active
  * Lista prestiti attivi utente
- * RF3: Gestione prestiti attivi
- * RF4: Prestiti attivi utente
  */
 export async function getActiveBorrows(req, res, next) {
   try {
