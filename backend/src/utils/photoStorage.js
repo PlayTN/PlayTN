@@ -1,15 +1,3 @@
-/**
- * Utility per gestione upload foto
- * 
- * ✅ IMPLEMENTAZIONE REALE
- * Salva foto su filesystem locale invece di base64 nel DB
- * 
- * Per produzione, considerare:
- * - Cloud Storage (S3, Cloudinary)
- * - Compressione immagini
- * - Validazione dimensioni/tipo
- */
-
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
