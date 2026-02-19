@@ -157,7 +157,6 @@ async function formatAdminReportResponse(segnalazione) {
 /**
  * GET /api/v1/admin/reports
  * Lista tutte le segnalazioni
- * RF15: Lista tutte le segnalazioni
  */
 export async function getAllReports(req, res, next) {
   try {
@@ -312,7 +311,6 @@ export async function getAllReports(req, res, next) {
 /**
  * GET /api/v1/admin/reports/:id
  * Dettaglio segnalazione
- * RF15: Dettaglio segnalazione
  */
 export async function getReportById(req, res, next) {
   try {
@@ -377,7 +375,6 @@ export async function getReportById(req, res, next) {
 /**
  * PUT /api/v1/admin/reports/:id/priority
  * Classificazione priorità
- * RF15: Classificazione priorità
  */
 export async function updatePriority(req, res, next) {
   try {
@@ -437,7 +434,6 @@ export async function updatePriority(req, res, next) {
 /**
  * PUT /api/v1/admin/reports/:id/assign
  * Assegnare a intervento manutentivo
- * RF15: Assegnare a intervento manutentivo
  */
 export async function assignToMaintenance(req, res, next) {
   try {
@@ -499,7 +495,6 @@ export async function assignToMaintenance(req, res, next) {
 /**
  * PUT /api/v1/admin/reports/:id/status
  * Tracciamento stato
- * RF15: Tracciamento stato
  */
 export async function updateStatus(req, res, next) {
   try {
@@ -629,7 +624,6 @@ export async function updateStatus(req, res, next) {
 /**
  * GET /api/v1/admin/reports/stats
  * Statistiche segnalazioni
- * RF15: Statistiche segnalazioni
  */
 export async function getReportsStats(req, res, next) {
   try {
