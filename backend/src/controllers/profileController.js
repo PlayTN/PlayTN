@@ -45,7 +45,6 @@ function formatDuration(milliseconds) {
 /**
  * GET /api/v1/profile
  * Profilo utente completo
- * RF8: Visualizzazione tutte le iterazioni
  */
 export async function getProfile(req, res, next) {
   try {
@@ -217,7 +216,6 @@ export async function getProfile(req, res, next) {
 /**
  * GET /api/v1/profile/stats
  * Statistiche dettagliate utente
- * RF8: Statistiche utente
  */
 export async function getProfileStats(req, res, next) {
   try {
@@ -445,7 +443,6 @@ export async function getProfileStats(req, res, next) {
 /**
  * PUT /api/v1/profile/preferences
  * Aggiorna preferenze utente
- * RF8: Gestione preferenze
  */
 export async function updatePreferences(req, res, next) {
   try {
@@ -506,7 +503,6 @@ export async function updatePreferences(req, res, next) {
 /**
  * GET /api/v1/profile/favorites
  * Lista preferiti con disponibilità tempo reale
- * RF8: Preferiti con disponibilità tempo reale
  */
 export async function getFavorites(req, res, next) {
   try {
