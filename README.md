@@ -1,4 +1,5 @@
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 # UrbanLock: Ecosistema di Smart Locker Modulari per la Smart City
 
@@ -105,9 +106,16 @@ Il sistema si basa su tre pilastri: **Hardware Modulare, App Utente, Cloud Backe
 =======
 ## Il Progetto UrbanLock
 
+=======
+## Il Progetto UrbanLock
+
+>>>>>>> Stashed changes
 Documentazione completa:
 - [d1 - Descrizione Progetto](./docs/d1)
 - [d2 - Sviluppo](./docs/d2)
 - [d3 - Analisi Progettazione](./docs/d3)
 - [d4 - Report Finale](./docs/d4)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
