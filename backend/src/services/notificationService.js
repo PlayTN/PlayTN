@@ -96,7 +96,6 @@ export async function createNotification(
 
 /**
  * Notifica apertura/chiusura cella
- * RF5: Avvisi durante apertura/chiusura
  */
 export async function notifyAperturaChiusura(
   utenteId,
@@ -143,7 +142,6 @@ export async function notifyAperturaChiusura(
 
 /**
  * Notifica chiusura temporanea locker
- * RF5: Chiusure temporanee
  */
 export async function notifyChiusuraTemporanea(
   utenteId,
@@ -185,7 +183,6 @@ export async function notifyChiusuraTemporanea(
 
 /**
  * Notifica nuova postazione
- * RF5: Nuove postazioni
  */
 export async function notifyNuovaPostazione(utenteId, lockerId) {
   try {
@@ -216,7 +213,6 @@ export async function notifyNuovaPostazione(utenteId, lockerId) {
 
 /**
  * Notifica reminder donazione
- * RF5: Reminder appuntamenti donazioni
  */
 export async function notifyReminderDonazione(
   utenteId,
@@ -252,7 +248,6 @@ export async function notifyReminderDonazione(
 
 /**
  * Notifica reminder restituzione
- * RF5: Reminder restituzione materiale
  */
 export async function notifyReminderRestituzione(
   utenteId,
