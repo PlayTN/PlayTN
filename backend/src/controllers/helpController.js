@@ -5,7 +5,6 @@ import { ValidationError } from '../middleware/errorHandler.js';
 /**
  * GET /api/v1/help
  * Help e tutorial generale
- * RF7: Help e tutorial
  */
 export async function getHelp(req, res, next) {
   try {
@@ -95,7 +94,6 @@ export async function getHelp(req, res, next) {
 /**
  * GET /api/v1/help/tutorial
  * Tutorial iniziale
- * RF7: Tutorial iniziale
  */
 export async function getTutorial(req, res, next) {
   try {
@@ -177,7 +175,6 @@ export async function getTutorial(req, res, next) {
 /**
  * GET /api/v1/help/safety-rules
  * Norme sicurezza parchi
- * RF7: Norme sicurezza parchi
  */
 export async function getSafetyRules(req, res, next) {
   try {
@@ -259,7 +256,6 @@ export async function getSafetyRules(req, res, next) {
 /**
  * POST /api/v1/help/contact
  * Contatto ente comunale
- * RF7: Contatto ente comunale
  */
 export async function contactMunicipality(req, res, next) {
   try {
