@@ -23,21 +23,18 @@ const router = express.Router();
 /**
  * POST /api/v1/admin/login
  * Login operatore
- * RF13: Login operatore
  */
 router.post('/login', adminLogin);
 
 /**
  * GET /api/v1/admin/dashboard
  * Dashboard operatore
- * RF13: Dashboard operatore
  */
 router.get('/dashboard', authenticate, requireAdmin, getDashboard);
 
 /**
  * GET /api/v1/admin/map
  * Mappa lato operatore
- * RF13: Mappa lato operatore
  */
 router.get('/map', authenticate, requireAdmin, getAdminMap);
 
@@ -51,34 +48,25 @@ router.get('/interventions', authenticate, requireAdmin, getInterventions);
 /**
  * GET /api/v1/admin/donations
  * Pagina donazioni
- * RF13: Pagina donazioni
  */
 router.get('/donations', authenticate, requireAdmin, getAdminDonations);
 
 /**
  * GET /api/v1/admin/tickets
  * Pagina ticket/segnalazioni
- * RF13: Pagina ticket/segnalazioni
  */
 router.get('/tickets', authenticate, requireAdmin, getAdminTickets);
 
 /**
  * GET /api/v1/admin/reporting
  * Pagina reportistica
- * RF13: Pagina reportistica
  */
 router.get('/reporting', authenticate, requireAdmin, getAdminReporting);
 
-/**
- * CRUD Operators
- * Queste route devono essere definite DOPO le route specifiche sopra
- * per evitare conflitti di routing
- */
 
 /**
  * GET /api/v1/admin/operators
  * Lista tutti gli operatori
- * Query: ?stato=...&reparto=...&search=...
  */
 router.get('/operators', authenticate, requireAdmin, getOperators);
 
