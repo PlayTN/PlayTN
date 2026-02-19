@@ -82,7 +82,6 @@ function calcolaDistanza(lat1, lng1, lat2, lng2) {
 /**
  * GET /api/v1/lockers/search
  * Ricerca testuale locker
- * RF2: Ricerca testuale completa
  */
 export async function searchLockers(req, res, next) {
   try {
@@ -167,7 +166,6 @@ export async function searchLockers(req, res, next) {
 /**
  * GET /api/v1/lockers/nearby
  * Ricerca locker per distanza
- * RF2: Ricerca per distanza dall'utente
  */
 export async function searchNearby(req, res, next) {
   try {
@@ -241,7 +239,6 @@ export async function searchNearby(req, res, next) {
 /**
  * GET /api/v1/lockers (esteso con filtri)
  * Filtri combinati per locker
- * RF2: Filtri combinati completi
  */
 export async function searchWithFilters(req, res, next) {
   try {
@@ -410,8 +407,6 @@ export async function searchWithFilters(req, res, next) {
 /**
  * GET /api/v1/lockers?preferences=...
  * Ricerca con preferenze personali
- * RF2: Preferenze personali
- * RF8: Filtri preferenze utente
  */
 export async function searchWithPreferences(req, res, next) {
   try {
