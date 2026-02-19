@@ -56,7 +56,6 @@ function parseDate(dateString) {
 /**
  * GET /api/v1/history
  * Storico completo utilizzo
- * RF9: Tracking completo utilizzo
  */
 export async function getHistory(req, res, next) {
   try {
@@ -201,7 +200,6 @@ export async function getHistory(req, res, next) {
 /**
  * GET /api/v1/history/stats
  * Statistiche storico
- * RF9: Statistiche attrezzature più usate, parchi preferiti, ore di accesso
  */
 export async function getHistoryStats(req, res, next) {
   try {
@@ -396,8 +394,6 @@ export async function getHistoryStats(req, res, next) {
 /**
  * GET /api/v1/history/segnalazioni
  * Storico segnalazioni
- * RF8: Storico segnalazioni
- * RF9: Storico segnalazioni
  */
 export async function getHistorySegnalazioni(req, res, next) {
   try {
@@ -479,8 +475,6 @@ export async function getHistorySegnalazioni(req, res, next) {
 /**
  * GET /api/v1/history/postazioni
  * Storico postazioni usate
- * RF8: Storico postazioni usate
- * RF9: Storico postazioni
  */
 export async function getHistoryPostazioni(req, res, next) {
   try {
