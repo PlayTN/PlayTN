@@ -3,7 +3,6 @@ import config from '../config/env.js';
 
 /**
  * Genera access token e refresh token per un utente
- * RNF4: Token sicuri, non loggare mai tokens completi
  * @param {Object} user - Oggetto utente
  * @returns {Object} { accessToken, refreshToken }
  */
