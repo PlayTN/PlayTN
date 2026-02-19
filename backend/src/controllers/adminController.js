@@ -49,8 +49,6 @@ async function formatAdminLockerResponse(locker) {
 
 /**
  * GET /api/v1/admin/lockers
- * Lista tutti i locker
- * RF14: Lista tutti i locker
  */
 export async function getAllLockers(req, res, next) {
   try {
@@ -137,7 +135,6 @@ export async function getAllLockers(req, res, next) {
 /**
  * PUT /api/v1/admin/lockers/:id/status
  * Modificare stato online/offline
- * RF14: Modificare stato online/offline
  */
 export async function updateLockerStatus(req, res, next) {
   try {
@@ -212,7 +209,6 @@ export async function updateLockerStatus(req, res, next) {
 /**
  * PUT /api/v1/admin/lockers/:id/maintenance
  * Impostare manutenzione
- * RF14: Impostare manutenzione
  */
 export async function setMaintenance(req, res, next) {
   try {
@@ -319,7 +315,6 @@ export async function setMaintenance(req, res, next) {
 /**
  * PUT /api/v1/admin/lockers/:id/restore
  * Ripristinare locker
- * RF14: Ripristinare locker
  */
 export async function restoreLocker(req, res, next) {
   try {
@@ -385,7 +380,6 @@ export async function restoreLocker(req, res, next) {
 /**
  * GET /api/v1/admin/lockers/:id/protocol
  * Protocollo rifornimento/manutenzione
- * RF14: Protocollo rifornimento/manutenzione
  */
 export async function getLockerProtocol(req, res, next) {
   try {
@@ -506,7 +500,6 @@ export async function getLockerProtocol(req, res, next) {
 /**
  * POST /api/v1/admin/lockers/:id/supply
  * Registrare rifornimento
- * RF14: Registrare rifornimento
  */
 export async function registerSupply(req, res, next) {
   try {
@@ -601,7 +594,6 @@ export async function registerSupply(req, res, next) {
 /**
  * POST /api/v1/admin/lockers/:id/maintenance-log
  * Log manutenzione
- * RF14: Log manutenzione
  */
 export async function logMaintenance(req, res, next) {
   try {
@@ -714,7 +706,6 @@ export async function logMaintenance(req, res, next) {
 /**
  * GET /api/v1/admin/commercial-cells
  * Lista celle commerciali
- * RF17: Lista celle commerciali
  */
 export async function getAllCommercialCells(req, res, next) {
   try {
@@ -819,7 +810,6 @@ export async function getAllCommercialCells(req, res, next) {
 /**
  * POST /api/v1/admin/commercial-cells/assign
  * Assegnare cella a negozio
- * RF17: Assegnare cella a negozio
  */
 export async function assignCommercialCell(req, res, next) {
   try {
@@ -953,7 +943,6 @@ export async function assignCommercialCell(req, res, next) {
 /**
  * PUT /api/v1/admin/commercial-cells/:id
  * Modificare assegnazione
- * RF17: Modificare assegnazione
  */
 export async function updateCommercialCell(req, res, next) {
   try {
@@ -1069,7 +1058,6 @@ export async function updateCommercialCell(req, res, next) {
 /**
  * GET /api/v1/admin/commercial-cells/:id/usage
  * Utilizzo cella commerciale
- * RF17: Utilizzo cella commerciale
  */
 export async function getCommercialCellUsage(req, res, next) {
   try {
@@ -1242,7 +1230,6 @@ export async function getCommercialCellUsage(req, res, next) {
 /**
  * PUT /api/v1/admin/cells/:id/status
  * Modificare stato cella (libera/manutenzione)
- * RF14: Modificare stato cella
  */
 export async function updateCellStatus(req, res, next) {
   try {
