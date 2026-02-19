@@ -3,8 +3,6 @@ import logger from '../utils/logger.js';
 
 /**
  * Servizio pagamenti MOCK
- * NOTA IMPORTANTE: Nessuna transazione bancaria reale, nessun dato sensibile
- * Solo mock per sviluppo/test
  */
 
 let paymentIdCounter = 0;
