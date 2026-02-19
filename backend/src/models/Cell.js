@@ -25,11 +25,6 @@ const cellSchema = new mongoose.Schema(
     stato: {
       type: String,
       enum: ['libera', 'occupata', 'aperto', 'manutenzione'],
-      // Stati possibili:
-      // - 'libera': Cella disponibile per assegnazione
-      // - 'aperto': Cella aperta fisicamente (sportello aperto, utente sta prendendo/posando oggetto)
-      // - 'occupata': Cella occupata da un noleggio attivo (sportello chiuso, oggetto in prestito/deposito)
-      // - 'manutenzione': Cella in manutenzione, non disponibile
       default: 'libera',
       index: true,
     },
