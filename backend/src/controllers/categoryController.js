@@ -9,7 +9,6 @@ import logger from '../utils/logger.js';
 /**
  * GET /api/v1/admin/categories
  * Lista tutte le categorie locker
- * RF20: Lista categorie locker
  */
 export async function getAllCategories(req, res, next) {
   try {
@@ -58,7 +57,6 @@ export async function getAllCategories(req, res, next) {
 /**
  * POST /api/v1/admin/categories
  * Crea nuova categoria locker
- * RF20: Crea categoria locker
  */
 export async function createCategory(req, res, next) {
   try {
@@ -120,7 +118,6 @@ export async function createCategory(req, res, next) {
 /**
  * GET /api/v1/admin/categories/:id
  * Dettaglio categoria locker
- * RF20: Dettaglio categoria locker
  */
 export async function getCategoryById(req, res, next) {
   try {
@@ -159,7 +156,6 @@ export async function getCategoryById(req, res, next) {
 /**
  * PUT /api/v1/admin/categories/:id
  * Aggiorna categoria locker
- * RF20: Aggiorna categoria locker
  */
 export async function updateCategory(req, res, next) {
   try {
@@ -240,7 +236,6 @@ export async function updateCategory(req, res, next) {
 /**
  * DELETE /api/v1/admin/categories/:id
  * Elimina categoria locker
- * RF20: Elimina categoria locker
  */
 export async function deleteCategory(req, res, next) {
   try {
