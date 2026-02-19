@@ -105,7 +105,6 @@ async function formatAdminDonationResponse(donazione) {
 /**
  * GET /api/v1/admin/donations
  * Lista tutte le donazioni
- * RF16: Lista tutte le donazioni
  */
 export async function getAllDonations(req, res, next) {
   try {
@@ -192,7 +191,6 @@ export async function getAllDonations(req, res, next) {
 /**
  * PUT /api/v1/admin/donations/:id/status
  * Modificare stato donazione
- * RF16: Modificare stato
  */
 export async function updateDonationStatus(req, res, next) {
   try {
@@ -350,7 +348,6 @@ export async function updateDonationStatus(req, res, next) {
 /**
  * POST /api/v1/admin/donations/:id/contact
  * Contatto donatore
- * RF16: Contatto diretto con donatori
  */
 export async function contactDonator(req, res, next) {
   try {
@@ -458,7 +455,6 @@ export async function contactDonator(req, res, next) {
 /**
  * POST /api/v1/admin/donations/:id/attach-document
  * Allegare documentazione
- * RF16: Allegare documentazione
  */
 export async function attachDocument(req, res, next) {
   try {
