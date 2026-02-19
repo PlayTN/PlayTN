@@ -89,7 +89,6 @@ function estraiNumeroCella(cellaId) {
 /**
  * GET /api/v1/lockers
  * Lista tutti i locker con filtri opzionali
- * RF2: Disponibilità tempo reale, filtri tipologia
  */
 export async function getAllLockers(req, res, next) {
   try {
@@ -351,7 +350,6 @@ export async function getLockerBluetoothInfo(req, res, next) {
 /**
  * GET /api/v1/lockers/:id/cells/stats
  * Statistiche celle per locker
- * RF2: Calcolo disponibilità tempo reale
  */
 export async function getLockerCellStats(req, res, next) {
   try {
