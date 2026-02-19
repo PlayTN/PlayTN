@@ -90,7 +90,6 @@ async function formatNoleggioAsActiveCell(noleggio) {
 /**
  * POST /api/v1/cells/request
  * Richiedere nuova cella per deposito/prestito/pickup
- * RF3: Registrazione automatica giorno/orario/utente/ID armadietto
  */
 export async function requestCell(req, res, next) {
   try {
@@ -138,10 +137,8 @@ export async function requestCell(req, res, next) {
       throw new NotFoundError(`Locker ${lockerId} non trovato`);
     }
 
-    // RF3: Registra geolocalizzazione se presente
     const geolocalizzazione = req.body.geolocalizzazione || null;
 
-    // RF3: Registrazione automatica
     const now = new Date();
     const dataInizio = now;
     const oraInizio = formatTime(now);
@@ -205,7 +202,6 @@ export async function requestCell(req, res, next) {
     cell.stato = 'occupata';
     await cell.save();
 
-    // RF3: Log registrazione automatica
     logger.info(
       `Noleggio creato: ${noleggioId} - Utente: ${userId}, Cella: ${cell.cellaId}, Locker: ${lockerId}, Tipo: ${tipoDB}, Data: ${dataInizio.toISOString()}, Ora: ${oraInizio}`
     );
@@ -227,21 +223,6 @@ export async function requestCell(req, res, next) {
 /**
  * POST /api/v1/cells/open
  * Sbloccare cella (apertura vano)
- * RF3: Scansione QR/Bluetooth, geolocalizzazione attiva, gestione errori
- * Supporta sia cell_id (legacy) che pairingId (nuovo flusso backend-centric)
- */
-/**
- * POST /api/v1/cells/open
- * Apre una cella tramite pairingId o cell_id
- * 
- * **SICUREZZA - TUTTI I CONTROLLI CRITICI SONO LATO BACKEND:**
- * - Verifica pairingId esiste e appartiene all'utente autenticato
- * - Verifica pairingId è ancora attivo
- * - Verifica cella è ancora assegnata all'utente
- * - Verifica foto se richiesta
- * - Verifica QR/Bluetooth token se presente
- * 
- * Il frontend non può aprire celle senza pairingId valido verificato dal backend.
  */
 export async function openCell(req, res, next) {
   try {
@@ -321,59 +302,34 @@ export async function openCell(req, res, next) {
     if (!cell) {
       throw new NotFoundError(`Cella ${cell_id_final} non trovata`);
     }
+    
 
-    // NOTA: La foto NON è obbligatoria per l'apertura di una cella
-    // La foto è opzionale e viene usata solo per segnalare anomalie
-    // Se richiesta_foto è true, la foto può essere fornita ma non è obbligatoria per aprire
-    // La foto obbligatoria si applica solo a depositi/restituzioni specifici, non all'apertura
-
-    // RF3: Verifica Bluetooth token se presente (QR code non più utilizzato)
     if (noleggio.bluetoothToken && req.body.bluetoothToken) {
       if (noleggio.bluetoothToken !== req.body.bluetoothToken) {
         throw new ValidationError('Bluetooth token non valido');
       }
     }
 
-    // RF3: Registra geolocalizzazione se presente
+
     if (req.body.geolocalizzazione) {
       noleggio.geolocalizzazione = req.body.geolocalizzazione;
     }
 
-    // RF3: Salva foto anomalia se presente (implementazione reale)
+
     if (photo) {
       noleggio.fotoAnomalia = await savePhoto(photo, noleggio.noleggioId);
     }
 
-    // ========== APERTURA LOCKER FISICO ==========
-    // In produzione: invia comando al locker fisico tramite API/Bluetooth
-    // Il locker fisico riceverà il comando e aprirà la cella meccanicamente
+
     try {
-      // TODO PRODUZIONE: Sostituire con chiamata API reale al locker
-      // Esempio:
-      //   const lockerHardwareService = require('../services/lockerHardwareService');
-      //   await lockerHardwareService.openCell(lockerId, cell_id_final);
-      //   // Il locker fisico aprirà la cella e invierà conferma tramite sensore
-      
-      // ========== MOCK TESTING - RIMUOVERE IN PRODUZIONE ==========
-      // ATTENZIONE: Questo è solo per testing durante lo sviluppo
-      // In produzione, rimuovere questo blocco e implementare la chiamata reale al locker
+     
       logger.info(
         `[MOCK] ⚠️ SIMULAZIONE apertura locker fisico: lockerId=${lockerId}, cellId=${cell_id_final}`
       );
       logger.info(
         `[MOCK] ⚠️ In produzione, questo sarà sostituito con chiamata API reale al locker hardware`
       );
-      // Simula invio comando al locker (in produzione sarà reale)
-      // Il locker fisico riceverà il comando e aprirà la cella
-      // ========== FINE MOCK APERTURA ==========
-      
-      // ========== MOCK CHIUSURA AUTOMATICA - RIMUOVERE IN PRODUZIONE ==========
-      // ATTENZIONE: Questo è solo per testing durante lo sviluppo
-      // In produzione: il locker fisico invierà notifica di chiusura tramite sensore
-      // quando lo sportello viene effettivamente chiuso dall'utente
-      // 
-      // Per testing: simula chiusura automatica dopo 5 secondi dall'apertura
-      // Questo permette di testare il flusso completo senza locker fisico
+    
       logger.info(
         `[MOCK] ⚠️ Programmata chiusura automatica mock dopo 5 secondi per cella ${cell_id_final} - Noleggio: ${noleggio.noleggioId}`
       );
@@ -394,9 +350,6 @@ export async function openCell(req, res, next) {
           );
           
           if (noleggioUpdated.cellaAperta && !noleggioUpdated.cellaChiusa) {
-            // ========== MOCK: Simula chiusura automatica dopo 5 secondi ==========
-            // In produzione: questo stato verrà aggiornato dal locker fisico
-            // quando il sensore rileva che lo sportello è stato chiuso
             noleggioUpdated.cellaChiusa = true;
             noleggioUpdated.dataChiusura = new Date();
             noleggioUpdated.dataAggiornamento = new Date();
@@ -420,7 +373,6 @@ export async function openCell(req, res, next) {
             } else {
               logger.error(`[MOCK] ❌ Cella ${cell_id_final} non trovata durante aggiornamento stato`);
             }
-            // ========== FINE AGGIORNA STATO ==========
             
             logger.info(
               `[MOCK] ⚠️ Chiusura automatica simulata completata per cella ${cell_id_final} - Noleggio: ${noleggioUpdated.noleggioId}`
@@ -428,7 +380,6 @@ export async function openCell(req, res, next) {
             logger.info(
               `[MOCK] ⚠️ In produzione, questo sarà rilevato dal sensore del locker fisico`
             );
-            // ========== FINE MOCK CHIUSURA ==========
           } else {
             logger.warn(
               `[MOCK] ⚠️ Noleggio ${noleggioUpdated.noleggioId} già chiuso o non aperto: cellaAperta=${noleggioUpdated.cellaAperta}, cellaChiusa=${noleggioUpdated.cellaChiusa}`
@@ -491,7 +442,6 @@ export async function openCell(req, res, next) {
 /**
  * POST /api/v1/cells/close
  * Notificare chiusura sportello
- * RF3: Notifica chiusura sportello
  */
 export async function closeCell(req, res, next) {
   try {
@@ -585,7 +535,6 @@ export async function closeCell(req, res, next) {
 /**
  * POST /api/v1/cells/return
  * Restituire vano (per prestiti e ordini)
- * RF4: Restituzione vano
  */
 export async function returnCell(req, res, next) {
   try {
@@ -634,8 +583,6 @@ export async function returnCell(req, res, next) {
         'Foto obbligatoria per restituzione (richiede_foto: true)'
       );
     }
-
-    // RF4: Salva foto anomalia se presente (implementazione reale)
     if (photo) {
       noleggio.fotoAnomalia = await savePhoto(photo, noleggio.noleggioId);
     }
@@ -656,7 +603,6 @@ export async function returnCell(req, res, next) {
 
     await noleggio.save();
 
-    // RF4: Libera cella (Cell stato "libera")
     cell.stato = 'libera';
     await cell.save();
 
@@ -679,7 +625,6 @@ export async function returnCell(req, res, next) {
 /**
  * GET /api/v1/cells/active
  * Lista celle attive utente
- * RF9: Base per storico
  */
 export async function getActiveCells(req, res, next) {
   try {
@@ -714,7 +659,6 @@ export async function getActiveCells(req, res, next) {
 /**
  * GET /api/v1/cells/history
  * Storico utilizzi
- * RF9: Storico utilizzo completo
  */
 export async function getHistory(req, res, next) {
   try {
@@ -769,19 +713,6 @@ export async function getHistory(req, res, next) {
 /**
  * POST /api/v1/cells/verify-bluetooth-pairing
  * Verifica accoppiamento Bluetooth e assegna cella
- * RF3: Verifica prossimità e autorizzazione backend
- * 
- * **SICUREZZA - TUTTI I CONTROLLI CRITICI SONO LATO BACKEND:**
- * - Verifica UUID Bluetooth corrisponde al locker (match esatto normalizzato)
- * - Verifica prossimità tramite RSSI (se fornito)
- * - Verifica prossimità tramite geolocalizzazione (se fornita)
- * - Verifica cella esiste e è disponibile
- * - Verifica tipo cella corrisponde
- * - Verifica utente autenticato (middleware auth)
- * - Assegna cella solo dopo tutte le verifiche
- * 
- * Il frontend fa solo un pre-filtro per UX (matching esatto), ma la verifica finale
- * rigorosa è sempre fatta dal backend. Non fidarsi mai dei controlli frontend.
  */
 export async function verifyBluetoothPairing(req, res, next) {
   try {
@@ -822,7 +753,6 @@ export async function verifyBluetoothPairing(req, res, next) {
 
     // ========== MOCK MODE - SOLO PER TESTING/DEVELOPMENT ==========
     // Se BLUETOOTH_MOCK_MODE=true, bypassa tutte le verifiche di prossimità
-    // ATTENZIONE: Usare solo durante sviluppo/testing, NON in produzione
     if (config.bluetoothMockMode) {
       logger.warn(
         `[MOCK MODE] Bluetooth mock attivo - bypass verifiche UUID/RSSI/geolocalizzazione per locker ${lockerId}`
@@ -830,10 +760,6 @@ export async function verifyBluetoothPairing(req, res, next) {
       // In modalità mock, salta tutte le verifiche di prossimità
       // ma verifica comunque che locker e cella esistano
     } else {
-      // ========== VERIFICHE NORMALI (PRODUZIONE) ==========
-      // 2. Verifica che UUID corrisponda al locker (CONTROLLO CRITICO - solo backend)
-      // SICUREZZA: Richiediamo solo UUID esatto. Il nome Bluetooth è facilmente spoofabile e non viene usato.
-      // Normalizza UUID (rimuovi trattini e due punti per confronto)
       const normalizeUuid = (uuid) => uuid.replace(/[-:]/g, '').toLowerCase();
       const lockerUuidNormalized = normalizeUuid(locker.bluetoothUuid);
       const receivedUuidNormalized = normalizeUuid(bluetoothUuid);
@@ -863,9 +789,7 @@ export async function verifyBluetoothPairing(req, res, next) {
       }
 
       // 4. Verifica prossimità tramite geolocalizzazione (solo se RSSI non disponibile o dubbio)
-      // NOTA: La geolocalizzazione può essere imprecisa (GPS indoor, errori di posizionamento)
-      // Se RSSI è buono (es. > -70 dBm), la geolocalizzazione è solo un controllo aggiuntivo
-      // e non dovrebbe bloccare se c'è un RSSI valido
+  
       if (geolocation && geolocation.lat && geolocation.lng) {
         const lockerLat = locker.coordinate.lat;
         const lockerLng = locker.coordinate.lng;
