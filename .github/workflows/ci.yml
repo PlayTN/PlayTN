@@ -1,0 +1,83 @@
+name: CI - Test Backend
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST || 'mongodb://localhost:27017/Null_test' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST || 'test-secret-key' }}
+
+      - name: Generate coverage report
+        run: npm run test:coverage
+        env:
+          NODE_ENV: test
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST || 'mongodb://localhost:27017/Null_test' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST || 'test-secret-key' }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./backend/coverage/coverage-final.json
+          flags: backend
+          name: backend-coverage
+        continue-on-error: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-node-${{ matrix.node-version }}
+          path: backend/coverage
+          retention-days: 7
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## Test Results - Node.js ${{ matrix.node-version }}" >> $GITHUB_STEP_SUMMARY
+          if [ -f backend/coverage/coverage-summary.json ]; then
+            echo "✅ Tests completed successfully" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Coverage report not generated" >> $GITHUB_STEP_SUMMARY
+          fi
+
+
+

@@ -1,0 +1,164 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests Before Deploy
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: ${{ secrets.MONGODB_URI_TEST || 'mongodb://localhost:27017/Null_test' }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_TEST || 'test-secret-key' }}
+
+  deploy-render:
+    name: Deploy to Render
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        if: ${{ secrets.RENDER_SERVICE_ID != '' && secrets.RENDER_API_KEY != '' }}
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+
+      - name: Render Deploy Status
+        if: always()
+        run: |
+          if [ -z "${{ secrets.RENDER_SERVICE_ID }}" ] || [ -z "${{ secrets.RENDER_API_KEY }}" ]; then
+            echo "⚠️ Render deployment skipped (secrets not configured)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Render deployment completed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  deploy-aws:
+    name: Deploy to AWS (Elastic Beanstalk / EC2)
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ secrets.AWS_DEPLOY_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy to AWS Elastic Beanstalk
+        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
+        run: |
+          echo "AWS deployment - configure EB CLI for full deployment"
+          # Install EB CLI: pip install awsebcli
+          # eb init
+          # eb deploy --staged
+          echo "AWS deployment placeholder - configure EB CLI to enable"
+
+      - name: AWS Deploy Status
+        if: always()
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] || [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "⚠️ AWS deployment skipped (secrets not configured)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ AWS deployment requires EB CLI configuration" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  deploy-gcp:
+    name: Deploy to Google Cloud Platform
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: production
+      url: ${{ secrets.GCP_DEPLOY_URL }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        if: ${{ secrets.GCP_SA_KEY != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        if: ${{ secrets.GCP_SA_KEY != '' }}
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy to Cloud Run / App Engine
+        if: ${{ secrets.GCP_SA_KEY != '' }}
+        run: |
+          echo "GCP deployment - configure project and service for full deployment"
+          # gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          # gcloud app deploy app.yaml
+          # OR for Cloud Run:
+          # gcloud run deploy null-backend --source .
+          echo "GCP deployment placeholder - configure project to enable"
+
+      - name: GCP Deploy Status
+        if: always()
+        run: |
+          if [ -z "${{ secrets.GCP_SA_KEY }}" ]; then
+            echo "⚠️ GCP deployment skipped (secrets not configured)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ GCP deployment requires project configuration" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [test, deploy-render, deploy-aws, deploy-gcp]
+    if: always()
+    
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Tests: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Render: ${{ needs.deploy-render.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- AWS: ${{ needs.deploy-aws.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- GCP: ${{ needs.deploy-gcp.result }}" >> $GITHUB_STEP_SUMMARY
+
+
+

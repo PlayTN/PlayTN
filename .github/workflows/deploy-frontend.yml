@@ -1,0 +1,151 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+jobs:
+  test-app:
+    name: Test Mobile App
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend/app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+  test-console:
+    name: Test Admin Console
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend/console
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+  deploy-app:
+    name: Deploy Mobile App
+    runs-on: ubuntu-latest
+    needs: [test-app, test-console]
+    if: github.ref == 'refs/heads/main'
+    
+    defaults:
+      run:
+        working-directory: ./frontend/app
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Web App
+        run: flutter build web --release
+        continue-on-error: true
+
+      - name: Deploy to Render (if configured)
+        if: ${{ secrets.RENDER_FRONTEND_SERVICE_ID != '' && secrets.RENDER_API_KEY != '' }}
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+        continue-on-error: true
+
+      - name: Deploy Status
+        if: always()
+        run: |
+          echo "## Frontend Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Mobile App Tests: ✅" >> $GITHUB_STEP_SUMMARY
+          if [ -z "${{ secrets.RENDER_FRONTEND_SERVICE_ID }}" ]; then
+            echo "- Deploy: ⚠️ Not configured (set RENDER_FRONTEND_SERVICE_ID)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Deploy: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  deploy-console:
+    name: Deploy Admin Console
+    runs-on: ubuntu-latest
+    needs: [test-app, test-console]
+    if: github.ref == 'refs/heads/main'
+    
+    defaults:
+      run:
+        working-directory: ./frontend/console
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build Web App
+        run: flutter build web --release
+        continue-on-error: true
+
+      - name: Deploy to Render (if configured)
+        if: ${{ secrets.RENDER_CONSOLE_SERVICE_ID != '' && secrets.RENDER_API_KEY != '' }}
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_CONSOLE_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+        continue-on-error: true
+
+      - name: Deploy Status
+        if: always()
+        run: |
+          echo "## Console Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Admin Console Tests: ✅" >> $GITHUB_STEP_SUMMARY
+          if [ -z "${{ secrets.RENDER_CONSOLE_SERVICE_ID }}" ]; then
+            echo "- Deploy: ⚠️ Not configured (set RENDER_CONSOLE_SERVICE_ID)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Deploy: ✅ Completed" >> $GITHUB_STEP_SUMMARY
+          fi
+

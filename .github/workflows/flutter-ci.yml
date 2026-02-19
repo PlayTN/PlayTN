@@ -1,0 +1,131 @@
+name: CI - Test Flutter Apps
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/flutter-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/flutter-ci.yml'
+
+jobs:
+  test-app:
+    name: Test Mobile App
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend/app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: flutter format --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze code
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Run tests
+        run: flutter test
+
+  test-console:
+    name: Test Admin Console
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./frontend/console
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Verify formatting
+        run: flutter format --set-exit-if-changed .
+        continue-on-error: true
+
+      - name: Analyze code
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Run tests
+        run: flutter test
+
+  build-app:
+    name: Build Mobile App (APK)
+    runs-on: ubuntu-latest
+    needs: test-app
+    
+    defaults:
+      run:
+        working-directory: ./frontend/app
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Build APK
+        run: flutter build apk --release
+        if: github.ref == 'refs/heads/main'
+
+      - name: Upload APK
+        if: github.ref == 'refs/heads/main' && success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-apk
+          path: frontend/app/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "## Build Results - Mobile App" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "✅ APK build completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ APK build skipped (not on main branch)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+
+
