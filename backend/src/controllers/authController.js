@@ -6,9 +6,8 @@ import logger from '../utils/logger.js';
 /**
  * Login utente
  * 
- * ⚠️ MOCK SPID/CIE: Autenticazione semplificata per testing
+ * MOCK SPID/CIE: Autenticazione semplificata per testing
  * Implementazione reale: Richiede integrazione con provider SPID/CIE
- * Vedi MOCK_IMPLEMENTAZIONI.md per dettagli
  * POST /api/v1/auth/login
  */
 export async function login(req, res, next) {
