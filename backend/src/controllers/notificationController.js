@@ -24,7 +24,6 @@ const TIPI_NOTIFICA = [
 /**
  * GET /api/v1/notifications
  * Lista notifiche utente
- * RF5: Lista notifiche utente
  */
 export async function getNotifications(req, res, next) {
   try {
@@ -126,7 +125,6 @@ export async function getNotifications(req, res, next) {
 /**
  * GET /api/v1/notifications/unread
  * Notifiche non lette
- * RF5: Notifiche non lette
  */
 export async function getUnreadNotifications(req, res, next) {
   try {
@@ -204,7 +202,6 @@ export async function getUnreadNotifications(req, res, next) {
 /**
  * PUT /api/v1/notifications/:id/read
  * Marca come letta
- * RF5: Marca come letta
  */
 export async function markAsRead(req, res, next) {
   try {
