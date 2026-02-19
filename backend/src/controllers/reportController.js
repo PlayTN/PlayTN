@@ -63,7 +63,6 @@ async function formatReportResponse(segnalazione, options = {}) {
 /**
  * POST /api/v1/reports
  * Creare segnalazione
- * RF7: Creare segnalazione
  */
 export async function createReport(req, res, next) {
   try {
@@ -212,7 +211,6 @@ export async function createReport(req, res, next) {
 /**
  * GET /api/v1/reports
  * Lista segnalazioni utente
- * RF7: Lista segnalazioni utente
  */
 export async function getReports(req, res, next) {
   try {
@@ -328,7 +326,6 @@ export async function getReports(req, res, next) {
 /**
  * GET /api/v1/reports/:id
  * Dettaglio segnalazione
- * RF7: Dettaglio segnalazione
  */
 export async function getReportById(req, res, next) {
   try {
@@ -380,7 +377,6 @@ export async function getReportById(req, res, next) {
 /**
  * PUT /api/v1/reports/:id
  * Modificare segnalazione
- * RF7: Modificare segnalazione
  */
 export async function updateReport(req, res, next) {
   try {
@@ -484,7 +480,6 @@ export async function updateReport(req, res, next) {
 /**
  * DELETE /api/v1/reports/:id
  * Cancellare segnalazione
- * RF7: Cancellare segnalazione
  */
 export async function deleteReport(req, res, next) {
   try {
