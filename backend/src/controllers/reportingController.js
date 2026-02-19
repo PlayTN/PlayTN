@@ -12,7 +12,6 @@ import logger from '../utils/logger.js';
 /**
  * GET /api/v1/admin/reporting/usage
  * Report utilizzo parchi/attrezzature
- * RF18: Report utilizzo parchi/attrezzature
  */
 export async function getUsageReport(req, res, next) {
   try {
@@ -329,7 +328,6 @@ export async function getUsageReport(req, res, next) {
 /**
  * GET /api/v1/admin/reporting/popular-parks
  * Parchi più popolati
- * RF18: Parchi più popolati
  */
 export async function getPopularParks(req, res, next) {
   try {
@@ -418,7 +416,6 @@ export async function getPopularParks(req, res, next) {
 /**
  * GET /api/v1/admin/reporting/popular-categories
  * Categorie più richieste
- * RF18: Categorie più richieste
  */
 export async function getPopularCategories(req, res, next) {
   try {
@@ -493,7 +490,6 @@ export async function getPopularCategories(req, res, next) {
 /**
  * GET /api/v1/admin/reporting/comparison
  * Analisi comparativa tipologie locker
- * RF18: Analisi comparativa tipologie locker
  */
 export async function getComparisonReport(req, res, next) {
   try {
@@ -690,7 +686,6 @@ export async function getComparisonReport(req, res, next) {
 /**
  * POST /api/v1/admin/reporting/export/pdf
  * Esportazione PDF
- * RF18: Esportazione PDF
  */
 export async function exportPDF(req, res, next) {
   try {
@@ -773,7 +768,6 @@ export async function exportPDF(req, res, next) {
 /**
  * POST /api/v1/admin/reporting/export/excel
  * Esportazione Excel
- * RF18: Esportazione Excel
  */
 export async function exportExcel(req, res, next) {
   try {
@@ -855,7 +849,6 @@ export async function exportExcel(req, res, next) {
 /**
  * POST /api/v1/admin/reporting/schedule-email
  * Export periodico via email
- * RF18: Export periodico via email
  */
 export async function scheduleEmailExport(req, res, next) {
   try {
